@@ -13,6 +13,8 @@ let ObTElem = null;
 let ObBElem = null;
 let ObT2Elem = null;
 let ObB2Elem = null;
+let scoreElem = null;
+let score = 0;
 
 function starting() {
 
@@ -23,6 +25,15 @@ function starting() {
 	ObBElem = document.getElementById("obstacleB");
 	ObT2Elem = document.getElementById("obstacleT2");
 	ObB2Elem = document.getElementById("obstacleB2");
+	scoreElem = document.getElementById("score");
+	
+	function GenerationHole(ObB, ObT){
+		let halfHole = 55;
+		let random = Math.random() * (580 - halfHole * 2);
+		let heightHole = Math.max(halfHole * 2, random);
+		ObB.style.height = heightHole - halfHole + "px";
+		ObT.style.height = 580 - heightHole - halfHole + "px";
+	}
 
 	function GenerationObstacle(){
 		ObTElem.style.animation = 'none';
@@ -31,9 +42,7 @@ function starting() {
 		ObBElem.offsetHeight;
 		ObTElem.style.animation = 'obstacle 6s linear';
 		ObBElem.style.animation = 'obstacle 6s linear';
-		var random = Math.random() * 400 - 200;
-		ObBElem.style.height = 580/2 + random -55 + "px";//TODO meglio
-		ObTElem.style.height = 580/2 - random -55 + "px";
+		GenerationHole(ObBElem, ObTElem);
 	}
 
 	function GenerationObstacle2(){
@@ -43,9 +52,7 @@ function starting() {
 		ObB2Elem.offsetHeight;
 		ObT2Elem.style.animation = 'obstacle 6s linear';
 		ObB2Elem.style.animation = 'obstacle 6s linear';
-		var random = Math.random() * 400 - 200;
-		ObB2Elem.style.height = 580/2 + random -55 + "px";
-		ObT2Elem.style.height = 580/2 - random -55 + "px";
+		GenerationHole(ObB2Elem, ObT2Elem);
 	}
 
 	GenerationObstacle();
@@ -59,7 +66,7 @@ function starting() {
 		GenerationObstacle2();
 	});
 
-	setInterval(function(){ // collision detection
+	setInterval(function(){ 
 		let ObstacleTLeft = parseInt(window.getComputedStyle(ObTElem).getPropertyValue("left"))+15;
 		let ObstacleBLeft = parseInt(window.getComputedStyle(ObBElem).getPropertyValue("left"))+15;
 		let ObstacleTBottom = parseInt(window.getComputedStyle(ObTElem).getPropertyValue("height"))-10;
@@ -70,7 +77,11 @@ function starting() {
 		let ObstacleB2Top = parseInt(window.getComputedStyle(ObB2Elem).getPropertyValue("height"))-10;
 		let charY = parseInt(window.getComputedStyle(charElem).getPropertyValue("bottom"));
 	
-		if(((ObstacleTLeft && ObstacleBLeft) < 100) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {
+		if(((ObstacleTLeft < 75) && (ObstacleTLeft > 73)) || ((ObstacleT2Left < 75) && (ObstacleT2Left > 73))){// score incrementation
+			score += 1/2; //TODO meglio assolutamente
+			scoreElem.innerHTML = score;
+		}
+		if(((ObstacleTLeft && ObstacleBLeft) < 100) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {// collision detection
 			if((charY < ObstacleBTop) || (charY > 530 - ObstacleTBottom)){
 				alert("Game Over!");
 			}
@@ -162,7 +173,7 @@ function gotStream(stream) {
 	analyser = audioContext.createAnalyser();
 	analyser.fftSize = buflen;
 	mediaStreamSource.connect( analyser );
-	setInterval(updatePitch, 200);
+	setInterval(updatePitch, 150);
 }
 
 window.addEventListener("load", () => {
