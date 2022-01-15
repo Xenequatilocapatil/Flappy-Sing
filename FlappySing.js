@@ -18,6 +18,7 @@ let score = 0;
 let insideObstacle = false;
 let canvasHeight = 572;
 let charHeight = 60;
+let series = 0;
 
 //Altezza in pixel - nota
 //Sistemare interfaccia
@@ -28,11 +29,16 @@ let charHeight = 60;
 
 //Sfondo con righe per le note (solo per beta test)
 
-
-
-
+let fraMartino = [5, 7, 9, 5, 5, 7, 9, 5, 9, 10, 12, 12,  9, 10, 12, 12];
+//console.log(fraMartino.length);
+for(let i=0; i<fraMartino.length; i++){
+	fraMartino[i] = (fraMartino[i]+12) * 16;
+}
 
 function starting() {
+
+	series = 0;
+
 	noteElem = document.getElementById( "note" );
 	freqElem = document.getElementById( "freq" );
 	charElem = document.getElementById( "character" );
@@ -51,9 +57,14 @@ function starting() {
 	}
 
 	function GenerationHoleSeries(ObB, ObT){
-		let fraMartino = [5, 7, 9, 5, 5, 7, 9, 5, 9, 10, 12, 12,  9, 10, 12, 12];//TODO
-		fraMartino = fraMartino * 16;
-
+	
+		ObB.style.height = fraMartino[series] - 8 + "px";
+		ObT.style.height = canvasHeight - fraMartino[series] - 110 + "px";
+		series++;
+		if(series == fraMartino.length)
+			series = 0;
+		//console.log(series);
+		console.log(fraMartino);
 	}
 
 	function GenerationObstacle(){
@@ -61,9 +72,10 @@ function starting() {
 		ObBElem.style.animation = 'none'
 		ObTElem.offsetHeight;
 		ObBElem.offsetHeight;
-		ObTElem.style.animation = 'obstacle 6s linear';
-		ObBElem.style.animation = 'obstacle 6s linear';
-		GenerationHoleRandom(ObBElem, ObTElem);
+		ObTElem.style.animation = 'obstacle 4s linear'; //Cambiati da 6 a 4
+		ObBElem.style.animation = 'obstacle 4s linear';
+		GenerationHoleSeries(ObBElem, ObTElem);
+		//GenerationHoleRandom(ObBElem, ObTElem);
 	}
 
 	function GenerationObstacle2(){
@@ -71,13 +83,14 @@ function starting() {
 		ObB2Elem.style.animation = 'none'
 		ObT2Elem.offsetHeight;
 		ObB2Elem.offsetHeight;
-		ObT2Elem.style.animation = 'obstacle 6s linear';
-		ObB2Elem.style.animation = 'obstacle 6s linear';
-		GenerationHoleRandom(ObB2Elem, ObT2Elem);
+		ObT2Elem.style.animation = 'obstacle 4s linear';
+		ObB2Elem.style.animation = 'obstacle 4s linear';
+		GenerationHoleSeries(ObB2Elem, ObT2Elem);
+		//GenerationHoleRandom(ObB2Elem, ObT2Elem);
 	}
 
 	GenerationObstacle();
-	setTimeout(GenerationObstacle2, 3000);
+	setTimeout(GenerationObstacle2, 2000); //cambiato da 3000 a 2000
 
 	ObBElem.addEventListener('animationend', () => {
 		GenerationObstacle();
@@ -186,7 +199,8 @@ function updatePitch() {//it also update the character y position
         let note =  noteFromPitch( pitch );
         noteElem.innerHTML = noteStrings[note%12];
 		freqElem.innerHTML = Math.round(pitch) + "Hz";
-		charElem.style.transition = "bottom 0.7s linear";  //16px a semitono
+		//Velocità del pg aumentata da 0.7 a 0.4
+		charElem.style.transition = "bottom 0.4s linear";  //16px a semitono 
 		let pitchCor = Math.max(Math.log10(98), Math.log10(pitch))
 		let buff1 = Math.min(pitchCor, maxPitch)-Math.log10(98);
 		let buff2 = maxPitch - Math.log10(98);
