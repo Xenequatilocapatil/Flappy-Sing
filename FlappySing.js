@@ -15,6 +15,7 @@ let ObT2Elem = null;
 let ObB2Elem = null;
 let scoreElem = null;
 let score = 0;
+let insideObstacle = false;
 
 function starting() {
 
@@ -77,10 +78,16 @@ function starting() {
 		let ObstacleB2Top = parseInt(window.getComputedStyle(ObB2Elem).getPropertyValue("height"))-10;
 		let charY = parseInt(window.getComputedStyle(charElem).getPropertyValue("bottom"));
 	
-		if(((ObstacleTLeft < 75) && (ObstacleTLeft > 73)) || ((ObstacleT2Left < 75) && (ObstacleT2Left > 73))){// score incrementation
-			score += 1/2; //TODO meglio assolutamente
+		if(((ObstacleTLeft < 100) && (ObstacleTLeft > 50)) || ((ObstacleT2Left < 100) && (ObstacleT2Left > 50))){// score incrementation
+			insideObstacle = true;
+		}else{
+			if(insideObstacle == true){
+			score += 1;
 			scoreElem.innerHTML = score;
+			insideObstacle = false;
+			}
 		}
+
 		if(((ObstacleTLeft && ObstacleBLeft) < 100) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {// collision detection
 			if((charY < ObstacleBTop) || (charY > 530 - ObstacleTBottom)){
 				alert("Game Over!");
@@ -153,7 +160,7 @@ function updatePitch() {//it also update the character y position
     if (pitch == -1){
         noteElem.innerHTML = "--"
 		freqElem.innerHTML = "--Hz";
-		charElem.style.transition = "bottom 3.5s";
+		charElem.style.transition = "bottom 4s";
 		charElem.style.bottom = 0;
     }else {
         let note =  noteFromPitch( pitch );
@@ -173,7 +180,7 @@ function gotStream(stream) {
 	analyser = audioContext.createAnalyser();
 	analyser.fftSize = buflen;
 	mediaStreamSource.connect( analyser );
-	setInterval(updatePitch, 150);
+	setInterval(updatePitch, 100);
 }
 
 window.addEventListener("load", () => {
