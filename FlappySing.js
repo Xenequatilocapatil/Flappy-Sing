@@ -1,4 +1,4 @@
-"use strict";//ciao
+"use strict";
 let audioContext = null;
 let analyser = null;
 let mediaStreamSource = null;
@@ -16,6 +16,8 @@ let ObB2Elem = null;
 let scoreElem = null;
 let score = 0;
 let insideObstacle = false;
+let canvasHeight = 572;
+let charHeight = 60;
 
 //Altezza in pixel - nota
 //Sistemare interfaccia
@@ -31,7 +33,6 @@ let insideObstacle = false;
 
 
 function starting() {
-
 	noteElem = document.getElementById( "note" );
 	freqElem = document.getElementById( "freq" );
 	charElem = document.getElementById( "character" );
@@ -41,12 +42,18 @@ function starting() {
 	ObB2Elem = document.getElementById("obstacleB2");
 	scoreElem = document.getElementById("score");
 	
-	function GenerationHole(ObB, ObT){
+	function GenerationHoleRandom(ObB, ObT){
 		let halfHole = 55;
-		let random = Math.random() * (580 - halfHole * 2);
+		let random = Math.random() * (canvasHeight - halfHole * 2);
 		let heightHole = Math.max(halfHole * 2, random);
 		ObB.style.height = heightHole - halfHole + "px";
-		ObT.style.height = 580 - heightHole - halfHole + "px";
+		ObT.style.height = canvasHeight - heightHole - halfHole + "px";
+	}
+
+	function GenerationHoleSeries(ObB, ObT){
+		let fraMartino = [5, 7, 9, 5, 5, 7, 9, 5, 9, 10, 12, 12,  9, 10, 12, 12];//TODO
+		fraMartino = fraMartino * 16;
+
 	}
 
 	function GenerationObstacle(){
@@ -56,7 +63,7 @@ function starting() {
 		ObBElem.offsetHeight;
 		ObTElem.style.animation = 'obstacle 6s linear';
 		ObBElem.style.animation = 'obstacle 6s linear';
-		GenerationHole(ObBElem, ObTElem);
+		GenerationHoleRandom(ObBElem, ObTElem);
 	}
 
 	function GenerationObstacle2(){
@@ -66,11 +73,11 @@ function starting() {
 		ObB2Elem.offsetHeight;
 		ObT2Elem.style.animation = 'obstacle 6s linear';
 		ObB2Elem.style.animation = 'obstacle 6s linear';
-		GenerationHole(ObB2Elem, ObT2Elem);
+		GenerationHoleRandom(ObB2Elem, ObT2Elem);
 	}
 
 	GenerationObstacle();
-	setTimeout(GenerationObstacle2, 3500);
+	setTimeout(GenerationObstacle2, 3000);
 
 	ObBElem.addEventListener('animationend', () => {
 		GenerationObstacle();
@@ -101,16 +108,16 @@ function starting() {
 			}
 		}
 
-		if(((ObstacleTLeft && ObstacleBLeft) < 100) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {// collision detection
-			if((charY < ObstacleBTop) || (charY > 530 - ObstacleTBottom)){
+		/*if(((ObstacleTLeft && ObstacleBLeft) < 100) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {// collision detection
+			if((charY < ObstacleBTop) || (charY > canvasHeight-charHeight - ObstacleTBottom)){
 				alert("Game Over!");
 			}
 		}
 		if(((ObstacleT2Left && ObstacleB2Left) < 100) && ((ObstacleT2Left && ObstacleB2Left) > 50)) {
-			if((charY < ObstacleB2Top) || (charY > 530 - ObstacleT2Bottom)){
+			if((charY < ObstacleB2Top) || (charY > canvasHeight-charHeight - ObstacleT2Bottom)){
 				alert("Game Over!");
 			}
-		}
+		}*/
 	},10);
 	
     navigator.mediaDevices.getUserMedia({audio: true}).then(gotStream);
@@ -179,11 +186,11 @@ function updatePitch() {//it also update the character y position
         let note =  noteFromPitch( pitch );
         noteElem.innerHTML = noteStrings[note%12];
 		freqElem.innerHTML = Math.round(pitch) + "Hz";
-		charElem.style.transition = "bottom 0.7s linear";
-		let pitchCor = Math.max(2, Math.log10(pitch))
-		let buff1 = Math.min(pitchCor, maxPitch)-2;
-		let buff2 = maxPitch - 2;
-		charElem.style.bottom =  buff1/buff2 * 530 + "px";
+		charElem.style.transition = "bottom 0.7s linear";  //16px a semitono
+		let pitchCor = Math.max(Math.log10(98), Math.log10(pitch))
+		let buff1 = Math.min(pitchCor, maxPitch)-Math.log10(98);
+		let buff2 = maxPitch - Math.log10(98);
+		charElem.style.bottom =  buff1/buff2 * (canvasHeight-charHeight) + "px";
     }
 }
 
