@@ -17,6 +17,19 @@ let scoreElem = null;
 let score = 0;
 let insideObstacle = false;
 
+//Altezza in pixel - nota
+//Sistemare interfaccia
+//Score: 1 -> 'score:' scompare dopo
+
+//Aggiunte:
+//Note sugli ostacoli, gettone in mezzo al buco che viene preso
+
+//Sfondo con righe per le note (solo per beta test)
+
+
+
+
+
 function starting() {
 
 	noteElem = document.getElementById( "note" );
@@ -162,7 +175,7 @@ function updatePitch() {//it also update the character y position
 		freqElem.innerHTML = "--Hz";
 		charElem.style.transition = "bottom 4s";
 		charElem.style.bottom = 0;
-    }else {
+    }else { //manca la scala note-px
         let note =  noteFromPitch( pitch );
         noteElem.innerHTML = noteStrings[note%12];
 		freqElem.innerHTML = Math.round(pitch) + "Hz";
