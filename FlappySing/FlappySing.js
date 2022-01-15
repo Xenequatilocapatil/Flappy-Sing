@@ -1,0 +1,170 @@
+"use strict";
+let audioContext = null;
+let analyser = null;
+let mediaStreamSource = null;
+let noteElem = null;
+let freqElem = null;
+let buflen = 2048;
+const maxPitch = Math.log10(622.25);//D#5
+let buf = new Float32Array( buflen );
+let noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+let charElem = null;
+let ObTElem = null;
+let ObBElem = null;
+let ObT2Elem = null;
+let ObB2Elem = null;
+
+function starting() {
+
+	noteElem = document.getElementById( "note" );
+	freqElem = document.getElementById( "freq" );
+	charElem = document.getElementById( "character" );
+	ObTElem = document.getElementById("obstacleT");
+	ObBElem = document.getElementById("obstacleB");
+	ObT2Elem = document.getElementById("obstacleT2");
+	ObB2Elem = document.getElementById("obstacleB2");
+
+	function GenerationObstacle(){
+		ObTElem.style.animation = 'none';
+		ObBElem.style.animation = 'none'
+		ObTElem.offsetHeight;
+		ObBElem.offsetHeight;
+		ObTElem.style.animation = 'obstacle 6s linear';
+		ObBElem.style.animation = 'obstacle 6s linear';
+		var random = Math.random() * 400 - 200;
+		ObBElem.style.height = 580/2 + random -55 + "px";//TODO meglio
+		ObTElem.style.height = 580/2 - random -55 + "px";
+	}
+
+	function GenerationObstacle2(){
+		ObT2Elem.style.animation = 'none';
+		ObB2Elem.style.animation = 'none'
+		ObT2Elem.offsetHeight;
+		ObB2Elem.offsetHeight;
+		ObT2Elem.style.animation = 'obstacle 6s linear';
+		ObB2Elem.style.animation = 'obstacle 6s linear';
+		var random = Math.random() * 400 - 200;
+		ObB2Elem.style.height = 580/2 + random -55 + "px";
+		ObT2Elem.style.height = 580/2 - random -55 + "px";
+	}
+
+	GenerationObstacle();
+	setTimeout(GenerationObstacle2, 3500);
+
+	ObBElem.addEventListener('animationend', () => {
+		GenerationObstacle();
+	});
+
+	ObB2Elem.addEventListener('animationend', () => {
+		GenerationObstacle2();
+	});
+
+	setInterval(function(){ // collision detection
+		let ObstacleTLeft = parseInt(window.getComputedStyle(ObTElem).getPropertyValue("left"))+15;
+		let ObstacleBLeft = parseInt(window.getComputedStyle(ObBElem).getPropertyValue("left"))+15;
+		let ObstacleTBottom = parseInt(window.getComputedStyle(ObTElem).getPropertyValue("height"))-10;
+		let ObstacleBTop = parseInt(window.getComputedStyle(ObBElem).getPropertyValue("height"))-10;
+		let ObstacleT2Left = parseInt(window.getComputedStyle(ObT2Elem).getPropertyValue("left"))+15;
+		let ObstacleB2Left = parseInt(window.getComputedStyle(ObB2Elem).getPropertyValue("left"))+15;
+		let ObstacleT2Bottom = parseInt(window.getComputedStyle(ObT2Elem).getPropertyValue("height"))-10;
+		let ObstacleB2Top = parseInt(window.getComputedStyle(ObB2Elem).getPropertyValue("height"))-10;
+		let charY = parseInt(window.getComputedStyle(charElem).getPropertyValue("bottom"));
+	
+		if(((ObstacleTLeft && ObstacleBLeft) < 100) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {
+			if((charY < ObstacleBTop) || (charY > 530 - ObstacleTBottom)){
+				alert("Game Over!");
+			}
+		}
+		if(((ObstacleT2Left && ObstacleB2Left) < 100) && ((ObstacleT2Left && ObstacleB2Left) > 50)) {
+			if((charY < ObstacleB2Top) || (charY > 530 - ObstacleT2Bottom)){
+				alert("Game Over!");
+			}
+		}
+	},10);
+	
+    navigator.mediaDevices.getUserMedia({audio: true}).then(gotStream);
+}
+
+
+function noteFromPitch( frequency ) {
+	let noteNum = 12 * (Math.log( frequency / 440 )/Math.log(2) );
+	return Math.round( noteNum ) + 69;
+}
+
+function autoCorrelate( buf, sampleRate ) {
+	// Implements the ACF2+ algorithm
+	let SIZE = buf.length;
+	let rms = 0;
+
+	for (let i=0;i<SIZE;i++) {
+		const val = buf[i];
+		rms += val*val;
+	}
+	rms = Math.sqrt(rms/SIZE);
+	if (rms<0.02) // not enough signal
+		return -1;
+
+	var r1=0, r2=SIZE-1, thres=0.2;
+	for (var i=0; i<SIZE/2; i++)
+		if (Math.abs(buf[i])<thres) { r1=i; break; }
+	for (var i=1; i<SIZE/2; i++)
+		if (Math.abs(buf[SIZE-i])<thres) { r2=SIZE-i; break; }
+
+	buf = buf.slice(r1,r2);
+	SIZE = buf.length;
+
+	let c = new Array(SIZE).fill(0);
+	for (var i=0; i<SIZE; i++)
+		for (let j=0; j<SIZE-i; j++)
+			c[i] = c[i] + buf[j]*buf[j+i];
+
+	let d=0; while (c[d]>c[d+1]) d++;
+	let maxval=-1, maxpos=-1;
+	for (let i=d; i<SIZE; i++) {
+		if (c[i] > maxval) {
+			maxval = c[i];
+			maxpos = i;
+		}
+	}
+	let T0 = maxpos;
+
+	let x1=c[T0-1], x2=c[T0], x3=c[T0+1];
+	let a = (x1 + x3 - 2*x2)/2;
+	let b = (x3 - x1)/2;
+	if (a) T0 = T0 - b/(2*a);
+
+	return sampleRate/T0;
+}
+
+function updatePitch() {//it also update the character y position
+	analyser.getFloatTimeDomainData( buf );
+	let pitch = autoCorrelate( buf, audioContext.sampleRate );
+    if (pitch == -1){
+        noteElem.innerHTML = "--"
+		freqElem.innerHTML = "--Hz";
+		charElem.style.transition = "bottom 3.5s";
+		charElem.style.bottom = 0;
+    }else {
+        let note =  noteFromPitch( pitch );
+        noteElem.innerHTML = noteStrings[note%12];
+		freqElem.innerHTML = Math.round(pitch) + "Hz";
+		charElem.style.transition = "bottom 0.7s linear";
+		let pitchCor = Math.max(2, Math.log10(pitch))
+		let buff1 = Math.min(pitchCor, maxPitch)-2;
+		let buff2 = maxPitch - 2;
+		charElem.style.bottom =  buff1/buff2 * 530 + "px";
+    }
+}
+
+function gotStream(stream) {
+	audioContext = new AudioContext();
+	mediaStreamSource = audioContext.createMediaStreamSource(stream);
+	analyser = audioContext.createAnalyser();
+	analyser.fftSize = buflen;
+	mediaStreamSource.connect( analyser );
+	setInterval(updatePitch, 200);
+}
+
+window.addEventListener("load", () => {
+	starting();
+});
