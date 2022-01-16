@@ -32,7 +32,7 @@ let series = 0;
 let fraMartino = [5, 7, 9, 5, 5, 7, 9, 5, 9, 10, 12, 12,  9, 10, 12, 12];
 //console.log(fraMartino.length);
 for(let i=0; i<fraMartino.length; i++){
-	fraMartino[i] = (fraMartino[i]+12) * 16;
+	fraMartino[i] = (fraMartino[i]) * 16;
 }
 
 function starting() {
@@ -116,7 +116,7 @@ function starting() {
 		}else{
 			if(insideObstacle == true){
 			score += 1;
-			scoreElem.innerHTML = score;
+			scoreElem.innerHTML = `score: ${score}`; //ho modificato qua
 			insideObstacle = false;
 			}
 		}
