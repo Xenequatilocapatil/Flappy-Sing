@@ -5,10 +5,19 @@
 		<link rel="stylesheet" href="styles.css" />
 	</head>
     <body>
-			<span id="note">--</span>
-			<span id="freq">--</span>
-			<span id="score">score: </span>
-		<div id="game">
+		<div id = "start-screen" class="screen" style="display:block" >
+			<button onclick='starting()'> Start Game </button>
+		</div>
+
+		<div id = "gameover-screen" class="screen" style="display:none" >
+			<button onclick='starting()'> Retry </button>
+		</div>
+		
+		<span id="note">--</span>
+		<span id="freq">--</span>
+		<span id="score">score: </span>
+
+		<div id="game" style="display:none">
 			<div id="character"></div>
 			<div id="obstacleT"></div>
 			<div id="obstacleB"></div>
@@ -16,6 +25,8 @@
 			<div id="obstacleB2"></div>
 			<div id="line"></div>
 		</div>
+
 		<script src="FlappySing.js"></script>
+
     </body>
 </html>

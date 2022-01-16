@@ -36,7 +36,6 @@ let mode = true;// if true => random mode, if false => songs
 
 //Altezza in pixel - nota
 //Sistemare interfaccia
-//Score: 1 -> 'score:' scompare dopo
 
 //Aggiunte:
 //Note sugli ostacoli, gettone in mezzo al buco che viene preso
@@ -44,6 +43,10 @@ let mode = true;// if true => random mode, if false => songs
 //Sfondo con righe per le note (solo per beta test)
 
 function starting() {
+
+	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',false);
+	toggleScreen('game',true);
 
 	series = 0;
 
@@ -103,7 +106,7 @@ function starting() {
 	}
 
 	GenerationObstacle(choosenSong, mode);//chiamata iniziale
-	setTimeout(function(){
+	var timeoutVar = setTimeout(function(){
 		GenerationObstacle2(choosenSong, mode);
 	}, ObVel/2 * 1000); 
 
@@ -115,7 +118,7 @@ function starting() {
 		GenerationObstacle2(choosenSong, mode);
 	});
 
-	setInterval(function(){ 
+	var refreshIntervalID = setInterval(function(){ 
 		let ObstacleTLeft = parseInt(window.getComputedStyle(ObTElem).getPropertyValue("left"))+15;
 		let ObstacleBLeft = parseInt(window.getComputedStyle(ObBElem).getPropertyValue("left"))+15;
 		let ObstacleTBottom = parseInt(window.getComputedStyle(ObTElem).getPropertyValue("height"))-10;
@@ -138,17 +141,18 @@ function starting() {
 
 		if(((ObstacleTLeft && ObstacleBLeft) < 100) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {// collision detection
 			if((charY < ObstacleBTop) || (charY > canvasHeight-charHeight - ObstacleTBottom)){
-				alert("Game Over!");
+				gameOverReset(refreshIntervalID,timeoutVar);
 			}
 		}
 		if(((ObstacleT2Left && ObstacleB2Left) < 100) && ((ObstacleT2Left && ObstacleB2Left) > 50)) {
 			if((charY < ObstacleB2Top) || (charY > canvasHeight-charHeight - ObstacleT2Bottom)){
-				alert("Game Over!");
+				gameOverReset(refreshIntervalID,timeoutVar);
 			}
 		}
 	},10);
 	
-    navigator.mediaDevices.getUserMedia({audio: true}).then(gotStream);
+    //SPOSTATO IN AVANTI, SI ATTIVA PRIMA
+	//navigator.mediaDevices.getUserMedia({audio: true}).then(gotStream);
 }
 
 
@@ -205,21 +209,24 @@ function autoCorrelate( buf, sampleRate ) {
 function updatePitch() {//it also update the character y position
 	analyser.getFloatTimeDomainData( buf );
 	let pitch = autoCorrelate( buf, audioContext.sampleRate );
-    if (pitch == -1){
-        noteElem.innerHTML = "--"
-		freqElem.innerHTML = "--Hz";
-		charElem.style.transition = "bottom " + charFallVelocity +  "s";
-		charElem.style.bottom = 0;
-    }else { //manca la scala note-px
-        let note =  noteFromPitch( pitch );
-        noteElem.innerHTML = noteStrings[note%12];
-		freqElem.innerHTML = Math.round(pitch) + "Hz";
-		charElem.style.transition = "bottom " + charToTargetVelocity + "s linear";  //16px a semitono 
-		let pitchCor = Math.max(Math.log10(98), Math.log10(pitch))
-		let buff1 = Math.min(pitchCor, maxPitch)-Math.log10(98);
-		let buff2 = maxPitch - Math.log10(98);
-		charElem.style.bottom =  buff1/buff2 * (canvasHeight-charHeight) + "px";
-    }
+	if(noteElem != null && freqElem != null && charElem != null){
+		if (pitch == -1){
+			noteElem.innerHTML = "--"
+			freqElem.innerHTML = "--Hz";
+			charElem.style.transition = "bottom " + charFallVelocity +  "s";
+			charElem.style.bottom = 0;
+		}else { //manca la scala note-px
+			let note =  noteFromPitch( pitch );
+			noteElem.innerHTML = noteStrings[note%12];
+			freqElem.innerHTML = Math.round(pitch) + "Hz";
+			charElem.style.transition = "bottom " + charToTargetVelocity + "s linear";  //16px a semitono 
+			let pitchCor = Math.max(Math.log10(98), Math.log10(pitch))
+			let buff1 = Math.min(pitchCor, maxPitch)-Math.log10(98);
+			let buff2 = maxPitch - Math.log10(98);
+			charElem.style.bottom =  buff1/buff2 * (canvasHeight-charHeight) + "px";
+		}
+	}
+    
 }
 
 function gotStream(stream) {
@@ -231,6 +238,69 @@ function gotStream(stream) {
 	setInterval(updatePitch, 100);
 }
 
+/*
 window.addEventListener("load", () => {
 	starting();
 });
+*/
+
+window.addEventListener("load", () => {
+	navigator.mediaDevices.getUserMedia({audio: true}).then(gotStream);
+});
+
+function toggleScreen(id,toggle){
+	let element = document.getElementById(id);
+	let display = ( toggle ) ? 'block' : 'none' ;
+	element.style.display = display;
+}
+
+function gameOverReset(refreshIntervalID,timeoutVar){
+
+	//Clear the timeout for the generation of obstacle 2
+	clearTimeout(timeoutVar);
+	clearInterval(refreshIntervalID); //Stop the refreshing
+
+	//Remove the listener to prevent further generation of obstacle meanwhile. Not sure if necessary
+	ObBElem.removeEventListener('animationend', () => {
+		GenerationObstacle(choosenSong, mode);
+	});
+
+	ObB2Elem.removeEventListener('animationend', () => {
+		GenerationObstacle2(choosenSong, mode);
+	});
+
+	//Obstacle style manual reset
+	ObTElem.style.left = 850 + "px";
+	ObBElem.style.left = 850 + "px";
+	ObT2Elem.style.left = 850 + "px";
+	ObB2Elem.style.left = 850 + "px";
+
+	ObTElem.style.animation = 'none';
+	ObBElem.style.animation = 'none'
+	ObTElem.offsetHeight;
+	ObBElem.offsetHeight;
+
+	ObT2Elem.style.animation = 'none';
+	ObB2Elem.style.animation = 'none'
+	ObT2Elem.offsetHeight;
+	ObB2Elem.offsetHeight;
+	
+	//Variables reset
+	noteElem = null;
+	freqElem = null;
+	charElem = null;
+	ObTElem = null;
+	ObBElem = null;
+	ObT2Elem = null;
+	ObB2Elem = null;
+	scoreElem = null;
+
+	//alert("Game Over!");
+
+	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',true);
+	toggleScreen('game',false);
+
+	
+
+}
