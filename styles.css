@@ -23,7 +23,8 @@ body {
   display: inline-block;
   height:130px;
   font-size: 100px;
-  align-items: right;
+  position: absolute; /*ho modificato qua e riga sotto*/
+  right: 0px; 
 }
 
 #game {

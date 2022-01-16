@@ -43,7 +43,15 @@ let mode = true;// if true => random mode, if false => songs
 
 //Sfondo con righe per le note (solo per beta test)
 
+<<<<<<< HEAD
 
+=======
+let fraMartino = [5, 7, 9, 5, 5, 7, 9, 5, 9, 10, 12, 12,  9, 10, 12, 12];
+//console.log(fraMartino.length);
+for(let i=0; i<fraMartino.length; i++){
+	fraMartino[i] = (fraMartino[i]) * 16;
+}
+>>>>>>> main
 
 function starting() {
 
@@ -133,7 +141,7 @@ function starting() {
 		}else{
 			if(insideObstacle == true){
 			score += 1;
-			scoreElem.innerHTML = score;
+			scoreElem.innerHTML = `score: ${score}`; //ho modificato qua
 			insideObstacle = false;
 			}
 		}
