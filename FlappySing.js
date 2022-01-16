@@ -294,6 +294,7 @@ function gameOverReset(refreshIntervalID,timeoutVar){
 	ObT2Elem = null;
 	ObB2Elem = null;
 	scoreElem = null;
+	score = 0;
 
 	//alert("Game Over!");
 

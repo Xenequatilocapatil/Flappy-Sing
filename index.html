@@ -3,10 +3,16 @@
 	<head>
 		<title>FlappySing</title>
 		<link rel="stylesheet" href="styles.css" />
+		<link rel="stylesheet" href="game_menu.css" />
 	</head>
     <body>
-		<div id = "start-screen" class="screen" style="display:block" >
-			<button onclick='starting()'> Start Game </button>
+		
+		<div id = "start-screen" class = "menu screen" style="display:block">
+			<h1 class = "title">Flappy Sing</h1>
+			<ul>
+				<li class = "button button--play" onclick='starting()'>Play</li>
+				<li class = "button button--options">Options</li>
+				<li class = "button button--credits">Credits</li>
 		</div>
 
 		<div id = "gameover-screen" class="screen" style="display:none" >
@@ -16,17 +22,19 @@
 		<span id="note">--</span>
 		<span id="freq">--</span>
 		<span id="score">score: </span>
-
+	
 		<div id="game" style="display:none">
+
 			<div id="character"></div>
 			<div id="obstacleT"></div>
 			<div id="obstacleB"></div>
 			<div id="obstacleT2"></div>
 			<div id="obstacleB2"></div>
 			<div id="line"></div>
+
 		</div>
 
+		
 		<script src="FlappySing.js"></script>
-
     </body>
 </html>
