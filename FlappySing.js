@@ -16,10 +16,13 @@ let scoreElem = null;
 let score = 0;
 let insideObstacle = false;
 let series = 0;
+let oldBuff = [];
+let allowMovement = 0;
 //PARAMETRI
 const maxPitch = Math.log10(622.25);//D#5
 let charFallVelocity = 4;
 let charToTargetVelocity = 0.4;
+let charPitchOutOfRangeVelocity = 6;
 let ObVel = 3; //Obstacle velocity  //si potrebbe legare la ObVel alla charToTargetVelocity con qualche relazione furba
 let canvasHeight = 572;
 let charHeight = 60;
@@ -136,7 +139,7 @@ function starting() {
 			}
 		}
 
-		if(((ObstacleTLeft && ObstacleBLeft) < 100) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {// collision detection
+		/*if(((ObstacleTLeft && ObstacleBLeft) < 100) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {// collision detection
 			if((charY < ObstacleBTop) || (charY > canvasHeight-charHeight - ObstacleTBottom)){
 				alert("Game Over!");
 			}
@@ -145,7 +148,7 @@ function starting() {
 			if((charY < ObstacleB2Top) || (charY > canvasHeight-charHeight - ObstacleT2Bottom)){
 				alert("Game Over!");
 			}
-		}
+		}*/
 	},10);
 	
     navigator.mediaDevices.getUserMedia({audio: true}).then(gotStream);
@@ -212,13 +215,30 @@ function updatePitch() {//it also update the character y position
 		charElem.style.bottom = 0;
     }else { //manca la scala note-px
         let note =  noteFromPitch( pitch );
-        noteElem.innerHTML = noteStrings[note%12];
+        
 		freqElem.innerHTML = Math.round(pitch) + "Hz";
-		charElem.style.transition = "bottom " + charToTargetVelocity + "s linear";  //16px a semitono 
 		let pitchCor = Math.max(Math.log10(98), Math.log10(pitch))
 		let buff1 = Math.min(pitchCor, maxPitch)-Math.log10(98);
 		let buff2 = maxPitch - Math.log10(98);
-		charElem.style.bottom =  buff1/buff2 * (canvasHeight-charHeight) + "px";
+		for (let i=0; i<3; i++){
+			if(Math.abs(oldBuff[2-i] - buff1) < 0.02){
+				allowMovement++;
+
+			}else{
+				allowMovement = 0;
+			}
+		}
+		if (allowMovement > 2){
+			charElem.style.transition = "bottom " + charToTargetVelocity + "s linear"; 
+			charElem.style.bottom =  buff1/buff2 * (canvasHeight-charHeight) + "px";
+			noteElem.innerHTML = noteStrings[note%12];
+			allowMovement = 0;
+			
+		}
+		if(oldBuff.length == 3){
+			oldBuff.shift();
+		}
+		oldBuff.push(buff1);
     }
 }
 
@@ -228,7 +248,7 @@ function gotStream(stream) {
 	analyser = audioContext.createAnalyser();
 	analyser.fftSize = buflen;
 	mediaStreamSource.connect( analyser );
-	setInterval(updatePitch, 100);
+	setInterval(updatePitch, 50);
 }
 
 window.addEventListener("load", () => {
