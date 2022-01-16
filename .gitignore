@@ -4,3 +4,5 @@ package-lock.json
 "cose di test.txt"
 .parcel-cache
 dist
+#game_menu.html
+#game_menu.css
