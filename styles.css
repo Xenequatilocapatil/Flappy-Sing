@@ -18,12 +18,14 @@ body {
   height:100px;
   text-align: left
 }
+
+
 #score {
   color: rgb(0, 0, 0);
   display: inline-block;
   height:130px;
   font-size: 100px;
-  position: absolute; /*ho modificato qua e riga sotto*/
+  position: absolute; 
   right: 0px; 
 }
 
@@ -35,6 +37,13 @@ body {
   position: relative;
   overflow: hidden;
 
+}
+
+#targetNote, #targetNote2 {
+  color: rgb(0, 0, 0);
+  display: inline-block;
+  font-size: 50px;
+  position: absolute;  
 }
 
 #character {
