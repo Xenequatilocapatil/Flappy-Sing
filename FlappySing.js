@@ -25,20 +25,20 @@ let oldNote;
 //PARAMETRI
 const maxPitch = Math.log10(622.25);//D#5
 let charFallVelocity = 4;
-let charToTargetVelocity = 0.35;
-let ObVel = 4; //Obstacle velocity  //si potrebbe legare la ObVel alla charToTargetVelocity con qualche relazione furba
+let charToTargetVelocity = charFallVelocity/14;//il 14 è discutibile
+let ObVel = 4; //Obstacle velocity in random mode
 let canvasHeight = 572;
 let charHeight = 60;
 let PxSemitone = 16; //pixxel a semitono
 let errorMargin = 25; //pixxel che separano il personaggio dagli ostacoli supponendo una perfetta intonazione
 
-//songs library  // la canzone dovrebbe contenere anche la velocità degli ostacoli e le velocità di movimento del pg
-let fraMartino = [5, 7, 9, 5, 5, 7, 9, 5, 9, 10, 12, 12, 9, 10, 12, 12];
-let perElisa = [21, 20, 21, 20, 21, 16, 19, 17, 14, 14, 5, 9, 14, 16, 16, 9, 13, 16, 17, 17, 9];
-let halo = [9, 11, 12, 11, 14, 12, 11, 9, "*", 16, 17, 19, "*", 17, 14, 17, 16, "*", "*", 4, 7, 9, 12, 14, 11, "*", 9, 12, 11, 9, 11, 7, "*", 9, "*"]
+//songs library  // il primo elemento rappresenta la ObVel
+let fraMartino = [2, 5, 7, 9, 5, 5, 7, 9, 5, 9, 10, 12, "*", 9, 10, 12, "*"]; //"*" => pausa
+let perElisa = [1.5, 21, 20, 21, 20, 21, 16, 19, 17, 14, "*", 5, 9, 14, 16, "*", 9, 13, 16, 17, "*", 9];
+let halo = [2, 9, 11, 12, 11, 14, 12, 11, 9, "*", 16, 17, 19, "*", 17, 14, 17, 16, "*", "*", 4, 7, 9, 12, 14, 11, "*", 9, 12, 11, 9, 11, 7, "*", 9, "*"]
 
 //game mode
-let choosenSong = halo; 
+let choosenSong = fraMartino; 
 let mode = true;// if true => random mode, if false => songs
 
 //Altezza in pixel - nota
@@ -52,7 +52,7 @@ let mode = true;// if true => random mode, if false => songs
 
 function starting() {
 
-	series = 0;
+	series = 1;
 	noteElem = document.getElementById( "note" );
 	freqElem = document.getElementById( "freq" );
 	targetNoteElem = document.getElementById( "targetNote" );
@@ -105,7 +105,7 @@ function starting() {
 		}
 		series++;
 		if(series == song.length){
-			series = 0;
+			series = 1;
 		}
 	}
 
@@ -113,6 +113,7 @@ function starting() {
 		if (mode){
 			GenerationHoleRandom(ObBElem, ObTElem, targetNoteElem);
 		}else{
+			ObVel = song[0];
 			GenerationHoleSeries(ObBElem, ObTElem, song, targetNoteElem);
 		}
 	}
@@ -121,6 +122,7 @@ function starting() {
 		if (mode){
 			GenerationHoleRandom(ObB2Elem, ObT2Elem, targetNote2Elem);
 		}else{
+			ObVel = song[0];
 			GenerationHoleSeries(ObB2Elem, ObT2Elem, song, targetNote2Elem);
 		}
 	}
