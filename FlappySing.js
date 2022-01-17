@@ -25,20 +25,20 @@ let oldNote;
 //PARAMETRI
 const maxPitch = Math.log10(622.25);//D#5
 let charFallVelocity = 4;
-let charToTargetVelocity = 0.4;
-let charPitchOutOfRangeVelocity = 6;
+let charToTargetVelocity = 0.35;
 let ObVel = 4; //Obstacle velocity  //si potrebbe legare la ObVel alla charToTargetVelocity con qualche relazione furba
 let canvasHeight = 572;
 let charHeight = 60;
 let PxSemitone = 16; //pixxel a semitono
-let errorMargin = 18; //pixxel che separano il personaggio dagli ostacoli supponendo una perfetta intonazione
+let errorMargin = 25; //pixxel che separano il personaggio dagli ostacoli supponendo una perfetta intonazione
 
 //songs library  // la canzone dovrebbe contenere anche la velocità degli ostacoli e le velocità di movimento del pg
 let fraMartino = [5, 7, 9, 5, 5, 7, 9, 5, 9, 10, 12, 12, 9, 10, 12, 12];
 let perElisa = [21, 20, 21, 20, 21, 16, 19, 17, 14, 14, 5, 9, 14, 16, 16, 9, 13, 16, 17, 17, 9];
+let halo = [9, 11, 12, 11, 14, 12, 11, 9, "*", 16, 17, 19, "*", 17, 14, 17, 16, "*", "*", 4, 7, 9, 12, 14, 11, "*", 9, 12, 11, 9, 11, 7, "*", 9, "*"]
 
 //game mode
-let choosenSong = perElisa; 
+let choosenSong = halo; 
 let mode = true;// if true => random mode, if false => songs
 
 //Altezza in pixel - nota
@@ -64,8 +64,14 @@ function starting() {
 	ObB2Elem = document.getElementById("obstacleB2");
 	scoreElem = document.getElementById("score");
 	
-	function GenerationHoleRandom(ObB, ObT){
-		let randomNote = Math.round(Math.random() * 26) + 3; //escludo le 3 note più alte e le 3 più basse => 32-6
+	function GenerationHoleRandom(ObB, ObT, targetNote){
+		ObT.style.animation = 'none';
+		ObB.style.animation = 'none';
+		ObT.offsetHeight;
+		ObB.offsetHeight;
+		ObT.style.animation = 'obstacle ' + ObVel + 's linear';
+		ObB.style.animation = 'obstacle ' + ObVel + 's linear';
+		let randomNote = Math.round(Math.random() * 24) + 4; //escludo le 4 note più alte e le 4 più basse => 32-8 
 		if(randomNote - oldNote > 12){ //evitò di generare intervalli maggiori di un'ottava
 			randomNote = randomNote -12;
 		}else if(randomNote - oldNote < -12){
@@ -74,69 +80,74 @@ function starting() {
 		ObB.style.height = randomNote * PxSemitone - errorMargin + "px";
 		ObT.style.height = canvasHeight - randomNote * PxSemitone - charHeight - errorMargin + "px";
 		oldNote = randomNote;
-		return randomNote;
+		targetNote.innerHTML = noteString2[randomNote%12];
+		targetNote.style.animation = 'none';
+		targetNote.offsetHeight;
+		targetNote.style.animation = 'obstacle ' + ObVel + 's linear';
+		targetNote.style.bottom = randomNote * PxSemitone  + "px";
 	}
 
-	function GenerationHoleSeries(ObB, ObT, song){
-	
-		ObB.style.height = song[series]*PxSemitone - errorMargin + "px";
-		ObT.style.height = canvasHeight - song[series]*PxSemitone - charHeight - errorMargin + "px";
+	function GenerationHoleSeries(ObB, ObT, song, targetNote){
+		if(song[series] != "*"){//per pausa
+			ObT.style.animation = 'none';
+			ObB.style.animation = 'none';
+			ObT.offsetHeight;
+			ObB.offsetHeight;
+			ObT.style.animation = 'obstacle ' + ObVel + 's linear';
+			ObB.style.animation = 'obstacle ' + ObVel + 's linear';
+			ObB.style.height = song[series]*PxSemitone - errorMargin + "px";
+			ObT.style.height = canvasHeight - song[series]*PxSemitone - charHeight - errorMargin + "px";
+			targetNote.innerHTML = noteString2[song[series]%12];
+			targetNote.style.animation = 'none';
+			targetNote.offsetHeight;
+			targetNote.style.animation = 'obstacle ' + ObVel + 's linear';
+			targetNote.style.bottom = song[series] * PxSemitone  + "px";
+		}
 		series++;
-		if(series == song.length)
+		if(series == song.length){
 			series = 0;
+		}
 	}
 
 	function GenerationObstacle(song, mode){
-		ObTElem.style.animation = 'none';
-		ObBElem.style.animation = 'none'
-		ObTElem.offsetHeight;
-		ObBElem.offsetHeight;
-		ObTElem.style.animation = 'obstacle ' + ObVel + 's linear';
-		ObBElem.style.animation = 'obstacle ' + ObVel + 's linear';
 		if (mode){
-			let note = GenerationHoleRandom(ObBElem, ObTElem);
-			targetNoteElem.innerHTML = noteString2[note%12];
-			targetNoteElem.style.animation = 'none';
-			targetNoteElem.offsetHeight;
-			targetNoteElem.style.animation = 'obstacle ' + ObVel + 's linear';
-			targetNoteElem.style.bottom = note * PxSemitone  + "px";
+			GenerationHoleRandom(ObBElem, ObTElem, targetNoteElem);
 		}else{
-			GenerationHoleSeries(ObBElem, ObTElem, song);
+			GenerationHoleSeries(ObBElem, ObTElem, song, targetNoteElem);
 		}
 	}
 
 	function GenerationObstacle2(song, mode){
-		ObT2Elem.style.animation = 'none';
-		ObB2Elem.style.animation = 'none'
-		ObT2Elem.offsetHeight;
-		ObB2Elem.offsetHeight;
-		ObT2Elem.style.animation = 'obstacle ' + ObVel + 's linear';
-		ObB2Elem.style.animation = 'obstacle ' + ObVel + 's linear';
 		if (mode){
-			let note = GenerationHoleRandom(ObB2Elem, ObT2Elem);
-			targetNote2Elem.innerHTML = noteString2[note%12];
-			targetNote2Elem.style.animation = 'none';
-			targetNote2Elem.offsetHeight;
-			targetNote2Elem.style.animation = 'obstacle ' + ObVel + 's linear';
-			targetNote2Elem.style.bottom = note * PxSemitone + "px";
-
+			GenerationHoleRandom(ObB2Elem, ObT2Elem, targetNote2Elem);
 		}else{
-			GenerationHoleSeries(ObB2Elem, ObT2Elem, song);
+			GenerationHoleSeries(ObB2Elem, ObT2Elem, song, targetNote2Elem);
 		}
 	}
 
-	GenerationObstacle(choosenSong, mode);//chiamata iniziale
+	GenerationObstacle(choosenSong, mode);
+
 	setTimeout(function(){
 		GenerationObstacle2(choosenSong, mode);
+	}, ObVel/2 * 1000);
+
+	setInterval(function(){
+		GenerationObstacle(choosenSong, mode)
+	}, ObVel*1000);
+
+	setTimeout(function(){
+		setInterval(function(){
+			GenerationObstacle2(choosenSong, mode)
+		}, ObVel*1000);
 	}, ObVel/2 * 1000); 
 
-	ObBElem.addEventListener('animationend', () => {
-		GenerationObstacle(choosenSong, mode);
+	/*ObBElem.addEventListener('animationend', () => {
+			GenerationObstacle(choosenSong, mode);
 	});
 
 	ObB2Elem.addEventListener('animationend', () => {
-		GenerationObstacle2(choosenSong, mode);
-	});
+			GenerationObstacle2(choosenSong, mode);
+	});*/
 
 	setInterval(function(){ 
 		let ObstacleTLeft = parseInt(window.getComputedStyle(ObTElem).getPropertyValue("left"))+15;
@@ -167,11 +178,13 @@ function starting() {
 		if(((ObstacleTLeft && ObstacleBLeft) < 100) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {// collision detection
 			if((charY < ObstacleBTop) || (charY > canvasHeight-charHeight - ObstacleTBottom)){
 				alert("Game Over!");
+				window.location.reload();
 			}
 		}
 		if(((ObstacleT2Left && ObstacleB2Left) < 100) && ((ObstacleT2Left && ObstacleB2Left) > 50)) {
 			if((charY < ObstacleB2Top) || (charY > canvasHeight-charHeight - ObstacleT2Bottom)){
 				alert("Game Over!");
+				window.location.reload();
 			}
 		}
 	},10);
@@ -233,14 +246,13 @@ function autoCorrelate( buf, sampleRate ) {
 function updatePitch() {//it also update the character y position
 	analyser.getFloatTimeDomainData( buf );
 	let pitch = autoCorrelate( buf, audioContext.sampleRate );
-    if (pitch == -1){
+    if ((pitch == -1) || (pitch < 98)){
         noteElem.innerHTML = "--"
 		freqElem.innerHTML = "--Hz";
 		charElem.style.transition = "bottom " + charFallVelocity +  "s";
 		charElem.style.bottom = 0;
-    }else { //manca la scala note-px
+    }else{
         let note =  noteFromPitch( pitch );
-        
 		freqElem.innerHTML = Math.round(pitch) + "Hz";
 		let pitchCor = Math.max(Math.log10(98), Math.log10(pitch))
 		let buff1 = Math.min(pitchCor, maxPitch)-Math.log10(98);
