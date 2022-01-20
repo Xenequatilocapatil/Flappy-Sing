@@ -1,4 +1,6 @@
-"use strict";							
+"use strict";
+var pitchEval = require("./AutoCorrelate");
+
 let audioContext = null;
 let analyser = null;
 let mediaStreamSource = null;
@@ -23,7 +25,8 @@ let oldBuff = [];
 let allowMovement = 0
 let oldNote;
 //PARAMETRI
-const maxPitch = Math.log10(622.25);//D#5
+const maxFreq = 622.25;//D#5
+const maxPitch = Math.log10(maxFreq);//D#5
 let charFallVelocity = 4;
 let charToTargetVelocity = charFallVelocity/14;//il 14 è discutibile
 let ObVel = 4; //Obstacle velocity in random mode
@@ -39,7 +42,7 @@ let halo = [2, 9, 11, 12, 11, 14, 12, 11, 9, "*", 16, 17, 19, "*", 17, 14, 17, 1
 
 //game mode
 let choosenSong = fraMartino; 
-let mode = true;// if true => random mode, if false => songs
+let mode = false;// if true => random mode, if false => songs
 
 //Altezza in pixel - nota
 //Sistemare interfaccia
@@ -177,6 +180,7 @@ function starting() {
 			targetNote2Elem.innerHTML = null;
 		}
 
+		
 		if(((ObstacleTLeft && ObstacleBLeft) < 100) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {// collision detection
 			if((charY < ObstacleBTop) || (charY > canvasHeight-charHeight - ObstacleTBottom)){
 				alert("Game Over!");
@@ -189,6 +193,7 @@ function starting() {
 				window.location.reload();
 			}
 		}
+
 	},10);
 	
     navigator.mediaDevices.getUserMedia({audio: true}).then(gotStream);
@@ -200,54 +205,10 @@ function noteFromPitch( frequency ) {
 	return Math.round( noteNum ) + 69;
 }
 
-function autoCorrelate( buf, sampleRate ) {
-	// Implements the ACF2+ algorithm
-	let SIZE = buf.length;
-	let rms = 0;
-
-	for (let i=0;i<SIZE;i++) {
-		const val = buf[i];
-		rms += val*val;
-	}
-	rms = Math.sqrt(rms/SIZE);
-	if (rms<0.01) // not enough signal
-		return -1;
-
-	var r1=0, r2=SIZE-1, thres=0.2;
-	for (var i=0; i<SIZE/2; i++)
-		if (Math.abs(buf[i])<thres) { r1=i; break; }
-	for (var i=1; i<SIZE/2; i++)
-		if (Math.abs(buf[SIZE-i])<thres) { r2=SIZE-i; break; }
-
-	buf = buf.slice(r1,r2);
-	SIZE = buf.length;
-
-	let c = new Array(SIZE).fill(0);
-	for (var i=0; i<SIZE; i++)
-		for (let j=0; j<SIZE-i; j++)
-			c[i] = c[i] + buf[j]*buf[j+i];
-
-	let d=0; while (c[d]>c[d+1]) d++;
-	let maxval=-1, maxpos=-1;
-	for (let i=d; i<SIZE; i++) {
-		if (c[i] > maxval) {
-			maxval = c[i];
-			maxpos = i;
-		}
-	}
-	let T0 = maxpos;
-
-	let x1=c[T0-1], x2=c[T0], x3=c[T0+1];
-	let a = (x1 + x3 - 2*x2)/2;
-	let b = (x3 - x1)/2;
-	if (a) T0 = T0 - b/(2*a);
-
-	return sampleRate/T0;
-}
-
 function updatePitch() {//it also update the character y position
 	analyser.getFloatTimeDomainData( buf );
-	let pitch = autoCorrelate( buf, audioContext.sampleRate );
+	let pitch = pitchEval.autoCorrelate( buf, audioContext.sampleRate );
+	
     if ((pitch == -1) || (pitch < 98)){
         noteElem.innerHTML = "--"
 		freqElem.innerHTML = "--Hz";
@@ -259,6 +220,7 @@ function updatePitch() {//it also update the character y position
 		let pitchCor = Math.max(Math.log10(98), Math.log10(pitch))
 		let buff1 = Math.min(pitchCor, maxPitch)-Math.log10(98);
 		let buff2 = maxPitch - Math.log10(98);
+		//let oldBufLength = 3;
 		for (let i=0; i<3; i++){
 			if(Math.abs(oldBuff[2-i] - buff1) < 0.02){
 				allowMovement++;
@@ -267,6 +229,7 @@ function updatePitch() {//it also update the character y position
 				allowMovement = 0;
 			}
 		}
+		//allowMovement = 3;
 		if (allowMovement > 2){
 			charElem.style.transition = "bottom " + charToTargetVelocity + "s linear"; 
 			charElem.style.bottom =  buff1/buff2 * (canvasHeight-charHeight) + "px";
@@ -283,10 +246,24 @@ function updatePitch() {//it also update the character y position
 
 function gotStream(stream) {
 	audioContext = new AudioContext();
+
+	//Filter section: 90 - 1k bandpass
+	let filterNode1 = new BiquadFilterNode(audioContext);
+	let filterNode2 = new BiquadFilterNode(audioContext);
+	filterNode1.type = 'highpass';
+	filterNode2.type = 'lowpass';
+	filterNode1.frequency.value = 90;
+	filterNode2.frequency.value = 1000;
+
 	mediaStreamSource = audioContext.createMediaStreamSource(stream);
 	analyser = audioContext.createAnalyser();
 	analyser.fftSize = buflen;
-	mediaStreamSource.connect( analyser );
+
+	mediaStreamSource.connect( filterNode1 );
+	filterNode1.connect( filterNode2 );
+	filterNode2.connect( analyser );
+
+
 	setInterval(updatePitch, 50);
 }
 
