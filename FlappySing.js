@@ -46,7 +46,6 @@ let mode = false;// if true => random mode, if false => songs
 
 //Altezza in pixel - nota
 //Sistemare interfaccia
-//Score: 1 -> 'score:' scompare dopo
 
 //Aggiunte:
 //Note sugli ostacoli, gettone in mezzo al buco che viene preso
@@ -220,16 +219,17 @@ function updatePitch() {//it also update the character y position
 		let pitchCor = Math.max(Math.log10(98), Math.log10(pitch))
 		let buff1 = Math.min(pitchCor, maxPitch)-Math.log10(98);
 		let buff2 = maxPitch - Math.log10(98);
-		//let oldBufLength = 3;
-		for (let i=0; i<3; i++){
-			if(Math.abs(oldBuff[2-i] - buff1) < 0.02){
+		let consistencySamples = 3;
+
+		for (let i=0; i<consistencySamples; i++){
+			if(Math.abs(oldBuff[consistencySamples-1-i] - buff1) < 0.02){
 				allowMovement++;
 
 			}else{
 				allowMovement = 0;
 			}
 		}
-		//allowMovement = 3;
+		
 		if (allowMovement > 2){
 			charElem.style.transition = "bottom " + charToTargetVelocity + "s linear"; 
 			charElem.style.bottom =  buff1/buff2 * (canvasHeight-charHeight) + "px";
@@ -237,7 +237,7 @@ function updatePitch() {//it also update the character y position
 			allowMovement = 0;
 			
 		}
-		if(oldBuff.length == 3){
+		if(oldBuff.length == consistencySamples){
 			oldBuff.shift();
 		}
 		oldBuff.push(buff1);
