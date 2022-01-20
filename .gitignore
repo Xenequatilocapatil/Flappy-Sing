@@ -4,3 +4,4 @@ package-lock.json
 "cose di test.txt"
 .parcel-cache
 dist
+.vscode
