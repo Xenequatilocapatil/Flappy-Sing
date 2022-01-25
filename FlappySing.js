@@ -1,5 +1,5 @@
 "use strict";
-var pitchEval = require("./AutoCorrelate");
+import { autoCorrelate } from "./AutoCorrelate";
 
 let audioContext = null;
 let analyser = null;
@@ -206,7 +206,7 @@ function noteFromPitch( frequency ) {
 
 function updatePitch() {//it also update the character y position
 	analyser.getFloatTimeDomainData( buf );
-	let pitch = pitchEval.autoCorrelate( buf, audioContext.sampleRate );
+	let pitch = autoCorrelate( buf, audioContext.sampleRate );
 	
     if ((pitch == -1) || (pitch < 98)){
         noteElem.innerHTML = "--"
