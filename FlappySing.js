@@ -52,7 +52,18 @@ let mode = false;// if true => random mode, if false => songs
 
 //Sfondo con righe per le note (solo per beta test)
 
+function toggleScreen(id,toggle){
+	let element = document.getElementById(id);
+	let display = ( toggle ) ? 'block' : 'none' ;
+	element.style.display = display;
+}
+
+
 function starting() {
+
+	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',false);
+	toggleScreen('game',true);
 
 	series = 1;
 	noteElem = document.getElementById( "note" );
@@ -153,7 +164,7 @@ function starting() {
 			GenerationObstacle2(choosenSong, mode);
 	});*/
 
-	setInterval(function(){ 
+	var refreshIntervalID = setInterval(function(){ 
 		let ObstacleTLeft = parseInt(window.getComputedStyle(ObTElem).getPropertyValue("left"))+15;
 		let ObstacleBLeft = parseInt(window.getComputedStyle(ObBElem).getPropertyValue("left"))+15;
 		let ObstacleTBottom = parseInt(window.getComputedStyle(ObTElem).getPropertyValue("height"))-10;
@@ -182,20 +193,23 @@ function starting() {
 		
 		if(((ObstacleTLeft && ObstacleBLeft) < 100) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {// collision detection
 			if((charY < ObstacleBTop) || (charY > canvasHeight-charHeight - ObstacleTBottom)){
-				alert("Game Over!");
-				window.location.reload();
+				gameOverReset(refreshIntervalID,timeoutVar);
+				/*alert("Game Over!");
+				window.location.reload();*/
 			}
 		}
 		if(((ObstacleT2Left && ObstacleB2Left) < 100) && ((ObstacleT2Left && ObstacleB2Left) > 50)) {
 			if((charY < ObstacleB2Top) || (charY > canvasHeight-charHeight - ObstacleT2Bottom)){
-				alert("Game Over!");
-				window.location.reload();
+				gameOverReset(refreshIntervalID,timeoutVar);
+				/*alert("Game Over!");
+				window.location.reload();*/
 			}
 		}
 
 	},10);
 	
-    navigator.mediaDevices.getUserMedia({audio: true}).then(gotStream);
+	//Spostato in avanti
+    //navigator.mediaDevices.getUserMedia({audio: true}).then(gotStream);
 }
 
 
@@ -268,5 +282,58 @@ function gotStream(stream) {
 }
 
 window.addEventListener("load", () => {
-	starting();
+	navigator.mediaDevices.getUserMedia({audio: true}).then(gotStream);
+	//starting();
 });
+
+function gameOverReset(refreshIntervalID,timeoutVar){
+
+	//Clear the timeout for the generation of obstacle 2
+	clearTimeout(timeoutVar);
+	clearInterval(refreshIntervalID); //Stop the refreshing
+
+	//Remove the listener to prevent further generation of obstacle meanwhile. Not sure if necessary
+	/*ObBElem.removeEventListener('animationend', () => {
+		GenerationObstacle(choosenSong, mode);
+	});
+
+	ObB2Elem.removeEventListener('animationend', () => {
+		GenerationObstacle2(choosenSong, mode);
+	});*/
+
+	//Obstacle style manual reset
+	ObTElem.style.left = 850 + "px";
+	ObBElem.style.left = 850 + "px";
+	ObT2Elem.style.left = 850 + "px";
+	ObB2Elem.style.left = 850 + "px";
+
+	ObTElem.style.animation = 'none';
+	ObBElem.style.animation = 'none'
+	ObTElem.offsetHeight;
+	ObBElem.offsetHeight;
+
+	ObT2Elem.style.animation = 'none';
+	ObB2Elem.style.animation = 'none'
+	ObT2Elem.offsetHeight;
+	ObB2Elem.offsetHeight;
+	
+	//Variables reset
+	noteElem = null;
+	freqElem = null;
+	charElem = null;
+	ObTElem = null;
+	ObBElem = null;
+	ObT2Elem = null;
+	ObB2Elem = null;
+	scoreElem = null;
+	score = 0;
+
+	//alert("Game Over!");
+
+	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',true);
+	toggleScreen('game',false);
+
+	
+
+}
