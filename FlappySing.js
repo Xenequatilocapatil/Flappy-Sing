@@ -24,6 +24,7 @@ let series = 0;
 let oldBuff = [];
 let allowMovement = 0
 let oldNote;
+
 //PARAMETRI
 const maxFreq = 622.25;//D#5
 const maxPitch = Math.log10(maxFreq);//D#5
@@ -52,12 +53,22 @@ let mode = false;// if true => random mode, if false => songs
 
 //Sfondo con righe per le note (solo per beta test)
 
-function toggleScreen(id,toggle){
-	let element = document.getElementById(id);
-	let display = ( toggle ) ? 'block' : 'none' ;
-	element.style.display = display;
-}
 
+
+//Elements gets
+noteElem = document.getElementById( "note" );
+freqElem = document.getElementById( "freq" );
+targetNoteElem = document.getElementById( "targetNote" );
+targetNote2Elem = document.getElementById( "targetNote2" );
+charElem = document.getElementById( "character" );
+ObTElem = document.getElementById("obstacleT");
+ObBElem = document.getElementById("obstacleB");
+ObT2Elem = document.getElementById("obstacleT2");
+ObB2Elem = document.getElementById("obstacleB2");
+scoreElem = document.getElementById("score");
+
+
+//Autocorrelation algorithm
 function autoCorrelate(buf, sampleRate) {
 	// Implements the ACF2+ algorithm
 	let SIZE = buf.length;
@@ -106,6 +117,118 @@ function autoCorrelate(buf, sampleRate) {
 }
 
 
+//Screen functions
+function toggleScreen(id,toggle){
+	let element = document.getElementById(id);
+	let display = ( toggle ) ? 'block' : 'none' ;
+	element.style.display = display;
+}
+
+function gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2){
+	
+	//Intervals stopping
+	clearTimeout(timeOutOb2); //Clear the timeout for the generation of obstacle 2 (if still running)
+	clearInterval(refreshIntervalID); //Stop the refreshing
+	clearInterval(intervalOb1); //Stop Ob1 generation
+	clearInterval(intervalOb2); //Stop Ob2 generation
+
+	//Obstacle style manual reset
+	ObTElem.style.left = 850 + "px";
+	ObBElem.style.left = 850 + "px";
+	ObT2Elem.style.left = 850 + "px";
+	ObB2Elem.style.left = 850 + "px";
+
+	ObTElem.style.animation = 'none';
+	ObBElem.style.animation = 'none'
+	ObTElem.offsetHeight;
+	ObBElem.offsetHeight;
+
+	ObT2Elem.style.animation = 'none';
+	ObB2Elem.style.animation = 'none'
+	ObT2Elem.offsetHeight;
+	ObB2Elem.offsetHeight;
+	
+	//Variables reset
+	insideObstacle = false;
+	allowMovement = 0;
+	series = 0;
+	score = 0;
+	
+	//Screen toggling
+	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',true);
+	toggleScreen('game',false);
+
+}
+
+//Obstacles and Holes generation
+function GenerationHoleRandom(ObB, ObT, targetNote){
+	ObT.style.animation = 'none';
+	ObB.style.animation = 'none';
+	ObT.offsetHeight;
+	ObB.offsetHeight;
+	ObT.style.animation = 'obstacle ' + ObVel + 's linear';
+	ObB.style.animation = 'obstacle ' + ObVel + 's linear';
+	let randomNote = Math.round(Math.random() * 24) + 4; //escludo le 4 note più alte e le 4 più basse => 32-8 
+	if(randomNote - oldNote > 12){ //evitò di generare intervalli maggiori di un'ottava
+		randomNote = randomNote -12;
+	}else if(randomNote - oldNote < -12){
+		randomNote = randomNote + 12;
+	}
+	ObB.style.height = randomNote * PxSemitone - errorMargin + "px";
+	ObT.style.height = canvasHeight - randomNote * PxSemitone - charHeight - errorMargin + "px";
+	oldNote = randomNote;
+	targetNote.innerHTML = noteString2[randomNote%12];
+	targetNote.style.animation = 'none';
+	targetNote.offsetHeight;
+	targetNote.style.animation = 'obstacle ' + ObVel + 's linear';
+	targetNote.style.bottom = randomNote * PxSemitone  + "px";
+}
+
+
+
+function GenerationHoleSeries(ObB, ObT, song, targetNote){
+	if(song[series] != "*"){//per pausa
+		ObT.style.animation = 'none';
+		ObB.style.animation = 'none';
+		ObT.offsetHeight;
+		ObB.offsetHeight;
+		ObT.style.animation = 'obstacle ' + ObVel + 's linear';
+		ObB.style.animation = 'obstacle ' + ObVel + 's linear';
+		ObB.style.height = song[series]*PxSemitone - errorMargin + "px";
+		ObT.style.height = canvasHeight - song[series]*PxSemitone - charHeight - errorMargin + "px";
+		targetNote.innerHTML = noteString2[song[series]%12];
+		targetNote.style.animation = 'none';
+		targetNote.offsetHeight;
+		targetNote.style.animation = 'obstacle ' + ObVel + 's linear';
+		targetNote.style.bottom = song[series] * PxSemitone  + "px";
+	}
+	series++;
+	if(series == song.length){
+		series = 1;
+	}
+}
+
+function GenerationObstacle(song, mode){
+	if (mode){
+		GenerationHoleRandom(ObBElem, ObTElem, targetNoteElem);
+	}else{
+		ObVel = song[0];
+		GenerationHoleSeries(ObBElem, ObTElem, song, targetNoteElem);
+	}
+}
+
+function GenerationObstacle2(song, mode){
+	if (mode){
+		GenerationHoleRandom(ObB2Elem, ObT2Elem, targetNote2Elem);
+	}else{
+		ObVel = song[0];
+		GenerationHoleSeries(ObB2Elem, ObT2Elem, song, targetNote2Elem);
+	}
+}
+
+
+//Main function
 function starting() {
 
 	toggleScreen('start-screen',false);
@@ -113,96 +236,27 @@ function starting() {
 	toggleScreen('game',true);
 
 	series = 1;
-	noteElem = document.getElementById( "note" );
-	freqElem = document.getElementById( "freq" );
-	targetNoteElem = document.getElementById( "targetNote" );
-	targetNote2Elem = document.getElementById( "targetNote2" );
-	charElem = document.getElementById( "character" );
-	ObTElem = document.getElementById("obstacleT");
-	ObBElem = document.getElementById("obstacleB");
-	ObT2Elem = document.getElementById("obstacleT2");
-	ObB2Elem = document.getElementById("obstacleB2");
-	scoreElem = document.getElementById("score");
 	
-	function GenerationHoleRandom(ObB, ObT, targetNote){
-		ObT.style.animation = 'none';
-		ObB.style.animation = 'none';
-		ObT.offsetHeight;
-		ObB.offsetHeight;
-		ObT.style.animation = 'obstacle ' + ObVel + 's linear';
-		ObB.style.animation = 'obstacle ' + ObVel + 's linear';
-		let randomNote = Math.round(Math.random() * 24) + 4; //escludo le 4 note più alte e le 4 più basse => 32-8 
-		if(randomNote - oldNote > 12){ //evitò di generare intervalli maggiori di un'ottava
-			randomNote = randomNote -12;
-		}else if(randomNote - oldNote < -12){
-			randomNote = randomNote + 12;
-		}
-		ObB.style.height = randomNote * PxSemitone - errorMargin + "px";
-		ObT.style.height = canvasHeight - randomNote * PxSemitone - charHeight - errorMargin + "px";
-		oldNote = randomNote;
-		targetNote.innerHTML = noteString2[randomNote%12];
-		targetNote.style.animation = 'none';
-		targetNote.offsetHeight;
-		targetNote.style.animation = 'obstacle ' + ObVel + 's linear';
-		targetNote.style.bottom = randomNote * PxSemitone  + "px";
-	}
+	charElem.style.bottom = 256 + "px"; //Reposition character
 
-	function GenerationHoleSeries(ObB, ObT, song, targetNote){
-		if(song[series] != "*"){//per pausa
-			ObT.style.animation = 'none';
-			ObB.style.animation = 'none';
-			ObT.offsetHeight;
-			ObB.offsetHeight;
-			ObT.style.animation = 'obstacle ' + ObVel + 's linear';
-			ObB.style.animation = 'obstacle ' + ObVel + 's linear';
-			ObB.style.height = song[series]*PxSemitone - errorMargin + "px";
-			ObT.style.height = canvasHeight - song[series]*PxSemitone - charHeight - errorMargin + "px";
-			targetNote.innerHTML = noteString2[song[series]%12];
-			targetNote.style.animation = 'none';
-			targetNote.offsetHeight;
-			targetNote.style.animation = 'obstacle ' + ObVel + 's linear';
-			targetNote.style.bottom = song[series] * PxSemitone  + "px";
-		}
-		series++;
-		if(series == song.length){
-			series = 1;
-		}
-	}
+	GenerationObstacle(choosenSong, mode); //initial call
 
-	function GenerationObstacle(song, mode){
-		if (mode){
-			GenerationHoleRandom(ObBElem, ObTElem, targetNoteElem);
-		}else{
-			ObVel = song[0];
-			GenerationHoleSeries(ObBElem, ObTElem, song, targetNoteElem);
-		}
-	}
-
-	function GenerationObstacle2(song, mode){
-		if (mode){
-			GenerationHoleRandom(ObB2Elem, ObT2Elem, targetNote2Elem);
-		}else{
-			ObVel = song[0];
-			GenerationHoleSeries(ObB2Elem, ObT2Elem, song, targetNote2Elem);
-		}
-	}
-
-	GenerationObstacle(choosenSong, mode);
-
-	setTimeout(function(){
+	setTimeout(function(){ //second obstacle call
 		GenerationObstacle2(choosenSong, mode);
 	}, ObVel/2 * 1000);
 
-	setInterval(function(){
+	var intervalOb1 = setInterval(function(){ 
 		GenerationObstacle(choosenSong, mode)
 	}, ObVel*1000);
 
-	setTimeout(function(){
-		setInterval(function(){
+	let intervalOb2 = null;
+	var timeOutOb2 = setTimeout(function(){
+		intervalOb2 = setInterval(function(){
 			GenerationObstacle2(choosenSong, mode)
 		}, ObVel*1000);
 	}, ObVel/2 * 1000); 
 
+	//Old code
 	/*ObBElem.addEventListener('animationend', () => {
 			GenerationObstacle(choosenSong, mode);
 	});
@@ -236,30 +290,24 @@ function starting() {
 		}else if(ObstacleT2Left < 110) {
 			targetNote2Elem.innerHTML = null;
 		}
-
 		
 		if(((ObstacleTLeft && ObstacleBLeft) < 100) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {// collision detection
 			if((charY < ObstacleBTop) || (charY > canvasHeight-charHeight - ObstacleTBottom)){
-				gameOverReset(refreshIntervalID);
-				alert("Game Over!");
-				//window.location.reload();
+				gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2);
 			}
 		}
 		if(((ObstacleT2Left && ObstacleB2Left) < 100) && ((ObstacleT2Left && ObstacleB2Left) > 50)) {
 			if((charY < ObstacleB2Top) || (charY > canvasHeight-charHeight - ObstacleT2Bottom)){
-				gameOverReset(refreshIntervalID);
-				alert("Game Over!");
-				//window.location.reload();
+				gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2);
 			}
 		}
 
 	},10);
 	
-	//Spostato in avanti
-    //navigator.mediaDevices.getUserMedia({audio: true}).then(gotStream);
 }
 
 
+//Input stream management
 function noteFromPitch( frequency ) {
 	let noteNum = 12 * (Math.log( frequency / 440 )/Math.log(2) );
 	return Math.round( noteNum ) + 69;
@@ -330,57 +378,6 @@ function gotStream(stream) {
 
 window.addEventListener("load", () => {
 	navigator.mediaDevices.getUserMedia({audio: true}).then(gotStream);
-	//starting();
 });
 
-function gameOverReset(refreshIntervalID){
 
-	//Clear the timeout for the generation of obstacle 2
-	//clearTimeout(timeoutVar);
-	clearInterval(refreshIntervalID); //Stop the refreshing
-
-	//Remove the listener to prevent further generation of obstacle meanwhile. Not sure if necessary
-	/*ObBElem.removeEventListener('animationend', () => {
-		GenerationObstacle(choosenSong, mode);
-	});
-
-	ObB2Elem.removeEventListener('animationend', () => {
-		GenerationObstacle2(choosenSong, mode);
-	});*/
-
-	//Obstacle style manual reset
-	
-	ObTElem.style.left = 850 + "px";
-	ObBElem.style.left = 850 + "px";
-	ObT2Elem.style.left = 850 + "px";
-	ObB2Elem.style.left = 850 + "px";
-
-	ObTElem.style.animation = 'none';
-	ObBElem.style.animation = 'none'
-	ObTElem.offsetHeight;
-	ObBElem.offsetHeight;
-
-	ObT2Elem.style.animation = 'none';
-	ObB2Elem.style.animation = 'none'
-	ObT2Elem.offsetHeight;
-	ObB2Elem.offsetHeight;
-	
-	//Variables reset
-	
-	noteElem = null;
-	freqElem = null;
-	charElem = null;
-	ObTElem = null;
-	ObBElem = null;
-	ObT2Elem = null;
-	ObB2Elem = null;
-	scoreElem = null;
-	score = 0;
-	
-	toggleScreen('start-screen',false);
-	toggleScreen('gameover-screen',true);
-	toggleScreen('game',false);
-
-	
-
-}

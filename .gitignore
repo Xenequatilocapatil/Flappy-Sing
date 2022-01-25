@@ -5,3 +5,4 @@ package-lock.json
 .parcel-cache
 dist
 .vscode
+cose_yay.ts
