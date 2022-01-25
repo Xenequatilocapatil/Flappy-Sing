@@ -1,5 +1,5 @@
 "use strict";
-import { autoCorrelate } from "./AutoCorrelate";
+//import { autoCorrelate } from "./AutoCorrelate";
 
 let audioContext = null;
 let analyser = null;
@@ -56,6 +56,53 @@ function toggleScreen(id,toggle){
 	let element = document.getElementById(id);
 	let display = ( toggle ) ? 'block' : 'none' ;
 	element.style.display = display;
+}
+
+function autoCorrelate(buf, sampleRate) {
+	// Implements the ACF2+ algorithm
+	let SIZE = buf.length;
+	let rms = 0;
+
+	for (let i = 0; i < SIZE; i++) {
+		const val = buf[i];
+		rms += val * val;
+	}
+	rms = Math.sqrt(rms / SIZE);
+	if (rms < 0.01) // not enough signal
+		return -1;
+
+	var r1 = 0, r2 = SIZE - 1, thres = 0.2;
+	for (var i = 0; i < SIZE / 2; i++)
+		if (Math.abs(buf[i]) < thres) { r1 = i; break; }
+	for (var i = 1; i < SIZE / 2; i++)
+		if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
+
+	buf = buf.slice(r1, r2);
+	SIZE = buf.length;
+
+	let c = new Array(SIZE).fill(0);
+	for (var i = 0; i < SIZE; i++)
+		for (let j = 0; j < SIZE - i; j++)
+			c[i] = c[i] + buf[j] * buf[j + i];
+
+	let d = 0; while (c[d] > c[d + 1])
+		d++;
+	let maxval = -1, maxpos = -1;
+	for (let i = d; i < SIZE; i++) {
+		if (c[i] > maxval) {
+			maxval = c[i];
+			maxpos = i;
+		}
+	}
+	let T0 = maxpos;
+
+	let x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
+	let a = (x1 + x3 - 2 * x2) / 2;
+	let b = (x3 - x1) / 2;
+	if (a)
+		T0 = T0 - b / (2 * a);
+
+	return sampleRate / T0;
 }
 
 
@@ -193,16 +240,16 @@ function starting() {
 		
 		if(((ObstacleTLeft && ObstacleBLeft) < 100) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {// collision detection
 			if((charY < ObstacleBTop) || (charY > canvasHeight-charHeight - ObstacleTBottom)){
-				gameOverReset(refreshIntervalID,timeoutVar);
-				/*alert("Game Over!");
-				window.location.reload();*/
+				gameOverReset(refreshIntervalID);
+				alert("Game Over!");
+				//window.location.reload();
 			}
 		}
 		if(((ObstacleT2Left && ObstacleB2Left) < 100) && ((ObstacleT2Left && ObstacleB2Left) > 50)) {
 			if((charY < ObstacleB2Top) || (charY > canvasHeight-charHeight - ObstacleT2Bottom)){
-				gameOverReset(refreshIntervalID,timeoutVar);
-				/*alert("Game Over!");
-				window.location.reload();*/
+				gameOverReset(refreshIntervalID);
+				alert("Game Over!");
+				//window.location.reload();
 			}
 		}
 
@@ -286,10 +333,10 @@ window.addEventListener("load", () => {
 	//starting();
 });
 
-function gameOverReset(refreshIntervalID,timeoutVar){
+function gameOverReset(refreshIntervalID){
 
 	//Clear the timeout for the generation of obstacle 2
-	clearTimeout(timeoutVar);
+	//clearTimeout(timeoutVar);
 	clearInterval(refreshIntervalID); //Stop the refreshing
 
 	//Remove the listener to prevent further generation of obstacle meanwhile. Not sure if necessary
@@ -302,6 +349,7 @@ function gameOverReset(refreshIntervalID,timeoutVar){
 	});*/
 
 	//Obstacle style manual reset
+	
 	ObTElem.style.left = 850 + "px";
 	ObBElem.style.left = 850 + "px";
 	ObT2Elem.style.left = 850 + "px";
@@ -318,6 +366,7 @@ function gameOverReset(refreshIntervalID,timeoutVar){
 	ObB2Elem.offsetHeight;
 	
 	//Variables reset
+	
 	noteElem = null;
 	freqElem = null;
 	charElem = null;
@@ -327,9 +376,7 @@ function gameOverReset(refreshIntervalID,timeoutVar){
 	ObB2Elem = null;
 	scoreElem = null;
 	score = 0;
-
-	//alert("Game Over!");
-
+	
 	toggleScreen('start-screen',false);
 	toggleScreen('gameover-screen',true);
 	toggleScreen('game',false);
