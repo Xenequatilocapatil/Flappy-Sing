@@ -380,4 +380,9 @@ window.addEventListener("load", () => {
 	navigator.mediaDevices.getUserMedia({audio: true}).then(gotStream);
 });
 
+function toMainMenu(){
+	toggleScreen('start-screen',true);
+	toggleScreen('gameover-screen',false);
+	toggleScreen('game',false);
+}
 
