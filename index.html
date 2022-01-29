@@ -10,15 +10,63 @@
 		<div id = "start-screen" class = "menu screen" style="display:block">
 			<h1 class = "title">Flappy Sing</h1>
 			<ul>
-				<li class = "button button--play" onclick="starting()">Play</li>
-				<li class = "button button--options">Options</li>
-				<li class = "button button--credits">Credits</li>
+				<li class = "button button--play" onclick="toModeMenu()">Play</li>
+				<li class = "button button--options" onclick="toOptionsMenu()">Options</li>
 		</div>
 
-		<div id = "gameover-screen" class="menu screen" style="display:none" >
+		<div id = "mode-screen" class = "menu screen" style="display:none">
+			<h1 class = "title">Choose Game Mode</h1>
 			<ul>
-				<li class = "button button--play" onclick="starting()">Retry</li>
-				<li class = "button button--options" onclick="toMainMenu()">Main Menu</li>
+				<li class = "button button--song" onclick="toSongMenu()">Song</li>
+				<li class = "button button--random" onclick="setRandom()">Random</li>
+				<li class = "button button--back" onclick="toMainMenu()">Back</li>
+		</div>
+
+		<div id = "song-screen" class = "menu screen" style="display:none">
+			<h1 class = "title">Choose song</h1>
+			<ul>
+				<li class = "button button--s1" onclick="selectSong(1)">Fra Martino</li>
+				<li class = "button button--s2" onclick="selectSong(2)">Per Elisa</li>
+				<li class = "button button--s3" onclick="selectSong(3)">Halo</li>
+				<li class = "button button--back" onclick="toModeMenu()">Back</li>
+		</div>
+
+		<div id = "options-screen" class="menu screen" style="display:none">
+			<label for="char_speed">Character Speed</label>
+			<input type="range"
+				id="char_speed"
+				min="0.5"
+				max="10"
+				value="4"
+				step="0.5"
+				aria-valuemin="1"
+				aria-valuemax="10"
+				aria-valuenow="4"
+				oninput="charSpeedUpdate(value)">
+			<output for="char_speed" id="Character_speed">4</output>
+
+			<label for="ob_speed">Obstacle Speed</label>
+			<input type="range"
+				id="ob_speed"
+				min="0.5"
+				max="10"
+				value="4"
+				step="0.5"
+				aria-valuemin="1"
+				aria-valuemax="10"
+				aria-valuenow="4"
+				oninput="obstacleSpeedUpdate(value)">
+			<output for="ob_speed" id="Obstacle_speed">4</output>
+
+			<ul>
+				<li class = "button button--back" onclick="toMainMenu()">Back</li>
+
+		</div>
+
+		<div id = "gameover-screen" class="menu screen" style="display:none">
+			<ul>
+				<li class = "button button--retry" onclick="starting()">Retry</li>
+				<li class = "button button--main-menu" onclick="toMainMenu()">Main Menu</li>
 		</div>
 		
 		

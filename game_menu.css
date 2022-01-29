@@ -15,7 +15,7 @@
     height: 48px;
     line-height: 48px;
     text-align: center;
-    position: absolute;
+    position: relative; /*changed absolute to relative*/
     left: calc(50% - 125px);
     border: 1px solid red;
     background-color: rgb(255, 255, 255);
@@ -27,6 +27,10 @@
     outline: 2px solid;
     outline-color: blue;
 
+    top: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+
 }
 
 .button:hover{
@@ -36,14 +40,14 @@
     text-shadow: green 1px 1px 2px;
 }
 
-.button--start{
+.button--first{
     top: 150px;
 }
 
-.button--options{
+.button--second{
     top: 250px;
 }
 
-.button--credits{
+.button--third{
     top: 350px;
 }

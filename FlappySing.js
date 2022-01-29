@@ -155,9 +155,7 @@ function gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2){
 	score = 0;
 	
 	//Screen toggling
-	toggleScreen('start-screen',false);
-	toggleScreen('gameover-screen',true);
-	toggleScreen('game',false);
+	toGameOverMenu();
 
 }
 
@@ -231,9 +229,7 @@ function GenerationObstacle2(song, mode){
 //Main function
 function starting() {
 
-	toggleScreen('start-screen',false);
-	toggleScreen('gameover-screen',false);
-	toggleScreen('game',true);
+	toStartingScreen();
 
 	series = 1;
 	
@@ -380,9 +376,89 @@ window.addEventListener("load", () => {
 	navigator.mediaDevices.getUserMedia({audio: true}).then(gotStream);
 });
 
+function toStartingScreen(){
+	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',false);
+	toggleScreen('game',true);
+	toggleScreen('options-screen',false);
+	toggleScreen('mode-screen',false);
+	toggleScreen('song-screen',false);
+}
+
 function toMainMenu(){
 	toggleScreen('start-screen',true);
 	toggleScreen('gameover-screen',false);
 	toggleScreen('game',false);
+	toggleScreen('options-screen',false);
+	toggleScreen('mode-screen',false);
+	toggleScreen('song-screen',false);
+}
+
+function toOptionsMenu(){
+	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',false);
+	toggleScreen('game',false);
+	toggleScreen('options-screen',true);
+	toggleScreen('mode-screen',false);
+	toggleScreen('song-screen',false);
+}
+
+function toGameOverMenu(){
+	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',true);
+	toggleScreen('game',false);
+	toggleScreen('options-screen',false);
+	toggleScreen('mode-screen',false);
+	toggleScreen('song-screen',false);
+}
+
+function toModeMenu(){
+	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',false);
+	toggleScreen('game',false);
+	toggleScreen('options-screen',false);
+	toggleScreen('mode-screen',true);
+	toggleScreen('song-screen',false);
+}
+
+function toSongMenu(){
+	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',false);
+	toggleScreen('game',false);
+	toggleScreen('options-screen',false);
+	toggleScreen('mode-screen',false);
+	toggleScreen('song-screen',true);
+}
+
+function selectSong(song_number){
+	mode = false;
+	switch (song_number){
+		case 1 :
+			choosenSong = fraMartino;
+			break;
+		case 2 :
+			choosenSong = perElisa;
+			break;
+		case 3 :
+			choosenSong = halo;
+			break;
+		default:
+			choosenSong = fraMartino;
+	}
+	starting();
+}
+
+function setRandom(){
+	mode = true;
+	starting();
+}
+
+function charSpeedUpdate(value){
+	charFallVelocity = value;
+	charToTargetVelocity = charFallVelocity/14;
+}
+
+function obstacleSpeedUpdate(value){
+	ObVel = value;
 }
 
