@@ -24,11 +24,11 @@ let series = 0;
 let oldBuff = [];
 let allowMovement = 0
 let oldNote;
-let pitchGuiding = true; //variables for pitch guiding
+let pitchGuiding = false; //variables for pitch guiding
 let pitch1 = null; 
 let pitch2 = null;
 let currentPitch = [null,null];
-let collisionDetection = false; //Disables collision (one time playing)
+let collisionDetection = true; //Disables collision (one time playing)
 
 //PARAMETRI
 const maxFreq = 622.25;//D#5
