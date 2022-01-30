@@ -24,6 +24,11 @@ let series = 0;
 let oldBuff = [];
 let allowMovement = 0
 let oldNote;
+let pitchGuiding = true; //variables for pitch guiding
+let pitch1 = null; 
+let pitch2 = null;
+let currentPitch = [null,null];
+let collisionDetection = false; //Disables collision (one time playing)
 
 //PARAMETRI
 const maxFreq = 622.25;//D#5
@@ -35,6 +40,8 @@ let canvasHeight = 572;
 let charHeight = 60;
 let PxSemitone = 16; //pixxel a semitono
 let errorMargin = 25; //pixxel che separano il personaggio dagli ostacoli supponendo una perfetta intonazione
+let lowerNoteLimit = 4; //G2 = 0; default to B2 = 4
+let noteExtension = 24; //default to B2+24 = B4; Max possible note is G5
 
 //songs library  // il primo elemento rappresenta la ObVel
 let fraMartino = [2, 5, 7, 9, 5, 5, 7, 9, 5, 9, 10, 12, "*", 9, 10, 12, "*"]; //"*" => pausa
@@ -44,15 +51,6 @@ let halo = [2, 9, 11, 12, 11, 14, 12, 11, 9, "*", 16, 17, 19, "*", 17, 14, 17, 1
 //game mode
 let choosenSong = fraMartino; 
 let mode = false;// if true => random mode, if false => songs
-
-//Altezza in pixel - nota
-//Sistemare interfaccia
-
-//Aggiunte:
-//Note sugli ostacoli, gettone in mezzo al buco che viene preso
-
-//Sfondo con righe per le note (solo per beta test)
-
 
 
 //Elements gets
@@ -125,7 +123,17 @@ function toggleScreen(id,toggle){
 }
 
 function gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2){
-	
+
+	//STOP OSCILLATORS!!
+	if(pitchGuiding){
+		oscStop();
+		oscStorage.stop();
+	}
+
+	//Reset pitch storage
+	currentPitch[0]= [0];
+	currentPitch[1]= [0];
+
 	//Intervals stopping
 	clearTimeout(timeOutOb2); //Clear the timeout for the generation of obstacle 2 (if still running)
 	clearInterval(refreshIntervalID); //Stop the refreshing
@@ -167,12 +175,18 @@ function GenerationHoleRandom(ObB, ObT, targetNote){
 	ObB.offsetHeight;
 	ObT.style.animation = 'obstacle ' + ObVel + 's linear';
 	ObB.style.animation = 'obstacle ' + ObVel + 's linear';
-	let randomNote = Math.round(Math.random() * 24) + 4; //escludo le 4 note più alte e le 4 più basse => 32-8 
-	if(randomNote - oldNote > 12){ //evitò di generare intervalli maggiori di un'ottava
-		randomNote = randomNote -12;
+
+	let randomNote = Math.round(Math.random() * noteExtension) + lowerNoteLimit; //escludo le 4 note più alte e le 4 più basse => 32-8 
+	
+	//Evito di generare intervalli maggiori di un'ottava
+	if(randomNote - oldNote > 12){ 
+		randomNote = randomNote - 12;
 	}else if(randomNote - oldNote < -12){
 		randomNote = randomNote + 12;
 	}
+
+	
+
 	ObB.style.height = randomNote * PxSemitone - errorMargin + "px";
 	ObT.style.height = canvasHeight - randomNote * PxSemitone - charHeight - errorMargin + "px";
 	oldNote = randomNote;
@@ -181,6 +195,11 @@ function GenerationHoleRandom(ObB, ObT, targetNote){
 	targetNote.offsetHeight;
 	targetNote.style.animation = 'obstacle ' + ObVel + 's linear';
 	targetNote.style.bottom = randomNote * PxSemitone  + "px";
+
+	let randomPitch = 98*Math.pow(2,randomNote/12);
+
+	return randomPitch;
+
 }
 
 
@@ -205,24 +224,48 @@ function GenerationHoleSeries(ObB, ObT, song, targetNote){
 	if(series == song.length){
 		series = 1;
 	}
+
+	let seriesPitch = null;
+
+	if(song[series] != '*'){
+		seriesPitch = 98*Math.pow(2,song[series]/12);
+	}
+		
+	return seriesPitch;
+
 }
 
 function GenerationObstacle(song, mode){
 	if (mode){
-		GenerationHoleRandom(ObBElem, ObTElem, targetNoteElem);
+		pitch1 = GenerationHoleRandom(ObBElem, ObTElem, targetNoteElem);
 	}else{
 		ObVel = song[0];
-		GenerationHoleSeries(ObBElem, ObTElem, song, targetNoteElem);
+		pitch1 = GenerationHoleSeries(ObBElem, ObTElem, song, targetNoteElem);
 	}
+
+	currentPitch[0] = currentPitch[1];
+	currentPitch[1] = pitch1;
+
+	if(pitchGuiding && (currentPitch[0] != null))
+		oscPlay(currentPitch[0]);
+
+
 }
 
 function GenerationObstacle2(song, mode){
 	if (mode){
-		GenerationHoleRandom(ObB2Elem, ObT2Elem, targetNote2Elem);
+		pitch2 = GenerationHoleRandom(ObB2Elem, ObT2Elem, targetNote2Elem);
 	}else{
 		ObVel = song[0];
-		GenerationHoleSeries(ObB2Elem, ObT2Elem, song, targetNote2Elem);
+		pitch2 = GenerationHoleSeries(ObB2Elem, ObT2Elem, song, targetNote2Elem);
 	}
+
+	currentPitch[0] = currentPitch[1];
+	currentPitch[1] = pitch2;
+
+	if(pitchGuiding && (currentPitch[0] != null))
+		oscPlay(currentPitch[0]);
+
 }
 
 
@@ -252,6 +295,14 @@ function starting() {
 		}, ObVel*1000);
 	}, ObVel/2 * 1000); 
 
+	/*
+	if(pitchGuiding){
+		currentPitch[0] = pitch1; //Force first
+		if(currentPitch[0] != null)
+			oscPlay(currentPitch[0]);
+	}*/
+	//START PLAYING CURRENT PITCH = PITCH1
+
 	//Old code
 	/*ObBElem.addEventListener('animationend', () => {
 			GenerationObstacle(choosenSong, mode);
@@ -274,11 +325,14 @@ function starting() {
 	
 		if(((ObstacleTLeft < 100) && (ObstacleTLeft > 50)) || ((ObstacleT2Left < 100) && (ObstacleT2Left > 50))){// score incrementation
 			insideObstacle = true;
+			if(pitchGuiding){
+				oscStop();
+			}
 		}else{
 			if(insideObstacle == true){
-			score += 1;
-			scoreElem.innerHTML = `score: ${score}`;
-			insideObstacle = false;
+				score += 1;
+				scoreElem.innerHTML = `score: ${score}`;
+				insideObstacle = false;
 			}
 		}
 		if (ObstacleTLeft < 110){//gettone preso
@@ -287,16 +341,21 @@ function starting() {
 			targetNote2Elem.innerHTML = null;
 		}
 		
-		if(((ObstacleTLeft && ObstacleBLeft) < 100) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {// collision detection
-			if((charY < ObstacleBTop) || (charY > canvasHeight-charHeight - ObstacleTBottom)){
-				gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2);
+
+		//COLLISION DETECTION:
+		if(collisionDetection){
+			if(((ObstacleTLeft && ObstacleBLeft) < 100) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {// collision detection
+				if((charY < ObstacleBTop) || (charY > canvasHeight-charHeight - ObstacleTBottom)){
+					gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2);
+				}
+			}
+			if(((ObstacleT2Left && ObstacleB2Left) < 100) && ((ObstacleT2Left && ObstacleB2Left) > 50)) {
+				if((charY < ObstacleB2Top) || (charY > canvasHeight-charHeight - ObstacleT2Bottom)){
+					gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2);
+				}
 			}
 		}
-		if(((ObstacleT2Left && ObstacleB2Left) < 100) && ((ObstacleT2Left && ObstacleB2Left) > 50)) {
-			if((charY < ObstacleB2Top) || (charY > canvasHeight-charHeight - ObstacleT2Bottom)){
-				gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2);
-			}
-		}
+		
 
 	},10);
 	
@@ -349,12 +408,61 @@ function updatePitch() {//it also update the character y position
     }
 }
 
+//Audio connections
+//Context
+audioContext = new AudioContext();
+//Filter section: 90 - 1k bandpass
+let filterNode1 = new BiquadFilterNode(audioContext);
+let filterNode2 = new BiquadFilterNode(audioContext);
+let oscStorage = null;
+let gainStorage = null;
+
+function oscPlay(pitch){
+	const o = new OscillatorNode(audioContext);
+	o.frequency.value = pitch;
+	var gain = new GainNode(audioContext);
+	gain.connect(audioContext.destination);
+	o.connect(gain);
+	const now = audioContext.currentTime;
+	gain.gain.setValueAtTime(0,now);
+	let max_gain = 0.3;
+	let attack = 0.2;
+
+	if(pitch < 200){
+		max_gain = 0.7;
+		if(pitch < 150){
+			max_gain = 1;
+		}
+	}
+
+	gain.gain.linearRampToValueAtTime(max_gain,now + attack);
+	//gain.gain.linearRampToValueAtTime(0,now + attack + decay); //For single test sound
+	o.start();
+	oscStorage = o;
+	gainStorage = gain;
+}
+
+function oscFreq(pitch){
+	oscStorage.frequency.value = pitch;
+}
+
+function oscStop(){
+	const now = audioContext.currentTime;
+	let decay = 0.1;
+	gainStorage.gain.linearRampToValueAtTime(0, now + decay);
+	oscStorage.stop();
+}
+
+
 function gotStream(stream) {
+	//Portato fuori:
+	/*
 	audioContext = new AudioContext();
 
 	//Filter section: 90 - 1k bandpass
 	let filterNode1 = new BiquadFilterNode(audioContext);
 	let filterNode2 = new BiquadFilterNode(audioContext);
+	*/
 	filterNode1.type = 'highpass';
 	filterNode2.type = 'lowpass';
 	filterNode1.frequency.value = 90;
