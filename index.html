@@ -7,6 +7,7 @@
 	</head>
     <body>
 		
+		<!-- MAIN MENU -->
 		<div id = "start-screen" class = "menu screen" style="display:block">
 			<h1 class = "title">Flappy Sing</h1>
 			<ul>
@@ -14,6 +15,7 @@
 				<li class = "button button--options" onclick="toOptionsMenu()">Options</li>
 		</div>
 
+		<!-- GAME MODE MENU -->
 		<div id = "mode-screen" class = "menu screen" style="display:none">
 			<h1 class = "title">Choose Game Mode</h1>
 			<ul>
@@ -22,6 +24,7 @@
 				<li class = "button button--back" onclick="toMainMenu()">Back</li>
 		</div>
 
+		<!-- SONG MENU -->
 		<div id = "song-screen" class = "menu screen" style="display:none">
 			<h1 class = "title">Choose song</h1>
 			<ul>
@@ -31,6 +34,7 @@
 				<li class = "button button--back" onclick="toModeMenu()">Back</li>
 		</div>
 
+		<!-- OPTIONS MENU -->
 		<div id = "options-screen" class="menu screen" style="display:none">
 			<label for="char_speed">Character Speed</label>
 			<input type="range"
@@ -42,8 +46,7 @@
 				aria-valuemin="1"
 				aria-valuemax="10"
 				aria-valuenow="4"
-				oninput="charSpeedUpdate(value)">
-			<output for="char_speed" id="Character_speed">4</output>
+			oninput="charSpeedUpdate(value)">
 
 			<label for="ob_speed">Obstacle Speed</label>
 			<input type="range"
@@ -55,15 +58,28 @@
 				aria-valuemin="1"
 				aria-valuemax="10"
 				aria-valuenow="4"
-				oninput="obstacleSpeedUpdate(value)">
-			<output for="ob_speed" id="Obstacle_speed">4</output>
+			oninput="obstacleSpeedUpdate(value)">
+			
+			<label for="pitch_guiding">Guide Pitch</label>
+			<input type = "checkbox"
+				id = "pitch_guiding"
+				name = "Guide Pitch"
+			onchange="updateGuidePitch()">
+
+			<label for="disable_collision">Disable Collision</label>
+			<input type = "checkbox"
+				id = "disable_collision"
+				name = "Disable Collision"
+			onchange="updateDisableCollision()">
 
 			<ul>
 				<li class = "button button--back" onclick="toMainMenu()">Back</li>
 
 		</div>
 
+		<!-- GAME OVER MENU -->
 		<div id = "gameover-screen" class="menu screen" style="display:none">
+			<h1 class = "title">Game Over!</h1>
 			<ul>
 				<li class = "button button--retry" onclick="starting()">Retry</li>
 				<li class = "button button--main-menu" onclick="toMainMenu()">Main Menu</li>

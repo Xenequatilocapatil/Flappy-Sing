@@ -1,9 +1,12 @@
 "use strict";
 //import { autoCorrelate } from "./AutoCorrelate";
 
-let audioContext = null;
-let analyser = null;
-let mediaStreamSource = null;
+let audioContext = null; //will be created on page load
+//Filter section: 90 - 1k bandpass
+let filterNode1 = null; //created on page load
+let filterNode2 = null; //created on page load
+let analyser = null; //for pitch detection
+let mediaStreamSource = null; //mic input node
 let noteElem = null;
 let freqElem = null;
 let buflen = 2048;
@@ -24,11 +27,14 @@ let series = 0;
 let oldBuff = [];
 let allowMovement = 0
 let oldNote;
-let pitchGuiding = false; //variables for pitch guiding
-let pitch1 = null; 
-let pitch2 = null;
-let currentPitch = [null,null];
-let collisionDetection = true; //Disables collision (one time playing)
+
+//Pitch guiding
+let pitchGuiding = false; //activation flag
+let oscStorage = null; //global oscillator node variable
+let gainStorage = null; //global gain node variable
+let pitch1 = null; //pitch of obstacle 1
+let pitch2 = null; //pitch of obstacle 2
+let currentPitch = [null,null]; //pitch pipeline
 
 //PARAMETRI
 const maxFreq = 622.25;//D#5
@@ -42,13 +48,14 @@ let PxSemitone = 16; //pixxel a semitono
 let errorMargin = 25; //pixxel che separano il personaggio dagli ostacoli supponendo una perfetta intonazione
 let lowerNoteLimit = 4; //G2 = 0; default to B2 = 4
 let noteExtension = 24; //default to B2+24 = B4; Max possible note is G5
+let collisionDetection = true; //Disables collision flag (one time playing)
 
-//songs library  // il primo elemento rappresenta la ObVel
+//Songs library  // il primo elemento rappresenta la ObVel
 let fraMartino = [2, 5, 7, 9, 5, 5, 7, 9, 5, 9, 10, 12, "*", 9, 10, 12, "*"]; //"*" => pausa
 let perElisa = [1.5, 21, 20, 21, 20, 21, 16, 19, 17, 14, "*", 5, 9, 14, 16, "*", 9, 13, 16, 17, "*", 9];
 let halo = [2, 9, 11, 12, 11, 14, 12, 11, 9, "*", 16, 17, 19, "*", 17, 14, 17, 16, "*", "*", 4, 7, 9, 12, 14, 11, "*", 9, 12, 11, 9, 11, 7, "*", 9, "*"]
 
-//game mode
+//Game mode
 let choosenSong = fraMartino; 
 let mode = false;// if true => random mode, if false => songs
 
@@ -131,8 +138,8 @@ function gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2){
 	}
 
 	//Reset pitch storage
-	currentPitch[0]= [0];
-	currentPitch[1]= [0];
+	currentPitch[0] = null;
+	currentPitch[1] = null;
 
 	//Intervals stopping
 	clearTimeout(timeOutOb2); //Clear the timeout for the generation of obstacle 2 (if still running)
@@ -155,6 +162,9 @@ function gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2){
 	ObB2Elem.style.animation = 'none'
 	ObT2Elem.offsetHeight;
 	ObB2Elem.offsetHeight;
+
+	targetNoteElem.innerHTML = null;
+	targetNote2Elem.innerHTML = null;
 	
 	//Variables reset
 	insideObstacle = false;
@@ -372,7 +382,7 @@ function updatePitch() {//it also update the character y position
 	analyser.getFloatTimeDomainData( buf );
 	let pitch = autoCorrelate( buf, audioContext.sampleRate );
 	
-    if ((pitch == -1) || (pitch < 98)){
+    if ((pitch == -1) || (pitch < 98)){ //Note too low or pitch not found
         noteElem.innerHTML = "--"
 		freqElem.innerHTML = "--Hz";
 		charElem.style.transition = "bottom " + charFallVelocity +  "s";
@@ -408,14 +418,7 @@ function updatePitch() {//it also update the character y position
     }
 }
 
-//Audio connections
-//Context
-audioContext = new AudioContext();
-//Filter section: 90 - 1k bandpass
-let filterNode1 = new BiquadFilterNode(audioContext);
-let filterNode2 = new BiquadFilterNode(audioContext);
-let oscStorage = null;
-let gainStorage = null;
+
 
 function oscPlay(pitch){
 	const o = new OscillatorNode(audioContext);
@@ -433,6 +436,9 @@ function oscPlay(pitch){
 		if(pitch < 150){
 			max_gain = 1;
 		}
+	} else{
+		if(pitch > 400)
+			max_gain = 0.2;
 	}
 
 	gain.gain.linearRampToValueAtTime(max_gain,now + attack);
@@ -455,27 +461,27 @@ function oscStop(){
 
 
 function gotStream(stream) {
-	//Portato fuori:
-	/*
-	audioContext = new AudioContext();
 
-	//Filter section: 90 - 1k bandpass
-	let filterNode1 = new BiquadFilterNode(audioContext);
-	let filterNode2 = new BiquadFilterNode(audioContext);
-	*/
+	//Creation
+	audioContext = new AudioContext();
+	filterNode1 = new BiquadFilterNode(audioContext);
+	filterNode2 = new BiquadFilterNode(audioContext);
+	
+	//Filter settings
 	filterNode1.type = 'highpass';
 	filterNode2.type = 'lowpass';
 	filterNode1.frequency.value = 90;
 	filterNode2.frequency.value = 1000;
 
+	//Mic input config
 	mediaStreamSource = audioContext.createMediaStreamSource(stream);
 	analyser = audioContext.createAnalyser();
 	analyser.fftSize = buflen;
 
+	//Connections
 	mediaStreamSource.connect( filterNode1 );
 	filterNode1.connect( filterNode2 );
 	filterNode2.connect( analyser );
-
 
 	setInterval(updatePitch, 50);
 }
@@ -568,5 +574,23 @@ function charSpeedUpdate(value){
 
 function obstacleSpeedUpdate(value){
 	ObVel = value;
+}
+
+function updateGuidePitch(){
+	let checkbox = document.getElementById('pitch_guiding');
+	if (checkbox.checked){
+		pitchGuiding = true;
+	}else{
+		pitchGuiding = false;
+	}
+}
+
+function updateDisableCollision(){
+	let checkbox = document.getElementById('disable_collision');
+	if (checkbox.checked){
+		collisionDetection = false;
+	}else{
+		collisionDetection = true;
+	}
 }
 
