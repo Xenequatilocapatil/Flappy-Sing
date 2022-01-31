@@ -2,14 +2,14 @@ body {
   background-color: rgb(127, 219, 255);
 }
 
-.screen{
+/*.screen{
   color: rgb(255, 8, 0);
   position: absolute;
   bottom: 60%;
   left: 40%;
   width: 100px;
   height: 100px;
-}
+}*/
 
 #note {
   color: rgb(0, 0, 0);

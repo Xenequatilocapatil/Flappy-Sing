@@ -26,7 +26,7 @@ let insideObstacle = false;
 let series = 0;
 let oldBuff = [];
 let allowMovement = 0
-let oldNote;
+let oldNote = 14;
 
 //Pitch guiding
 let pitchGuiding = false; //activation flag
@@ -40,15 +40,17 @@ let currentPitch = [null,null]; //pitch pipeline
 const maxFreq = 622.25;//D#5
 const maxPitch = Math.log10(maxFreq);//D#5
 let charFallVelocity = 4;
-let charToTargetVelocity = charFallVelocity/14;//il 14 è discutibile
+let charToTargetVelocity = 0.3;
 let ObVel = 4; //Obstacle velocity in random mode
 let canvasHeight = 572;
 let charHeight = 60;
 let PxSemitone = 16; //pixxel a semitono
-let errorMargin = 25; //pixxel che separano il personaggio dagli ostacoli supponendo una perfetta intonazione
+let errorMargin = 20; //pixxel che separano il personaggio dagli ostacoli supponendo una perfetta intonazione
 let lowerNoteLimit = 4; //G2 = 0; default to B2 = 4
 let noteExtension = 24; //default to B2+24 = B4; Max possible note is G5
+let maxInterval = 12;
 let collisionDetection = true; //Disables collision flag (one time playing)
+let intervalsVector = [];
 
 //Songs library  // il primo elemento rappresenta la ObVel
 let fraMartino = [2, 5, 7, 9, 5, 5, 7, 9, 5, 9, 10, 12, "*", 9, 10, 12, "*"]; //"*" => pausa
@@ -171,6 +173,8 @@ function gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2){
 	allowMovement = 0;
 	series = 0;
 	score = 0;
+	oldNote = 14;
+	scoreElem.innerHTML = `score: ${score}`;
 	
 	//Screen toggling
 	toGameOverMenu();
@@ -186,15 +190,27 @@ function GenerationHoleRandom(ObB, ObT, targetNote){
 	ObT.style.animation = 'obstacle ' + ObVel + 's linear';
 	ObB.style.animation = 'obstacle ' + ObVel + 's linear';
 
-	let randomNote = Math.round(Math.random() * noteExtension) + lowerNoteLimit; //escludo le 4 note più alte e le 4 più basse => 32-8 
-	
-	//Evito di generare intervalli maggiori di un'ottava
-	if(randomNote - oldNote > 12){ 
-		randomNote = randomNote - 12;
-	}else if(randomNote - oldNote < -12){
-		randomNote = randomNote + 12;
-	}
+	//let randomNote = Math.round(Math.random() * noteExtension) + lowerNoteLimit; //escludo le 4 note più alte e le 4 più basse => 32-8 
 
+	let randomInterval = intervalsVector[Math.round(Math.random() * (intervalsVector.length-1))]
+	let randomNote = oldNote + randomInterval ;
+	if ((randomNote < lowerNoteLimit) || (randomNote > (lowerNoteLimit + noteExtension))){
+		randomNote = oldNote - randomInterval;
+	}
+	console.log("old: ");
+	console.log(oldNote);
+	console.log("random:");
+	console.log(randomNote);
+	//Evito di generare intervalli maggiori di un'ottava
+	/*
+	if(oldNote != null){
+		let intervalDiff = randomNote - oldNote;
+		if(intervalDiff > maxInterval){ 
+			randomNote = randomNote - (intervalDiff - intervalDiff%maxInterval);
+		}else if(intervalDiff < -maxInterval){
+			randomNote = randomNote + (intervalDiff - intervalDiff%maxInterval);
+		}
+	}*/
 	
 
 	ObB.style.height = randomNote * PxSemitone - errorMargin + "px";
@@ -354,7 +370,7 @@ function starting() {
 
 		//COLLISION DETECTION:
 		if(collisionDetection){
-			if(((ObstacleTLeft && ObstacleBLeft) < 100) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {// collision detection
+			if(((ObstacleTLeft && ObstacleBLeft) < 100) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {
 				if((charY < ObstacleBTop) || (charY > canvasHeight-charHeight - ObstacleTBottom)){
 					gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2);
 				}
@@ -494,6 +510,7 @@ function toStartingScreen(){
 	toggleScreen('start-screen',false);
 	toggleScreen('gameover-screen',false);
 	toggleScreen('game',true);
+	toggleScreen('indicators', true);
 	toggleScreen('options-screen',false);
 	toggleScreen('mode-screen',false);
 	toggleScreen('song-screen',false);
@@ -503,6 +520,7 @@ function toMainMenu(){
 	toggleScreen('start-screen',true);
 	toggleScreen('gameover-screen',false);
 	toggleScreen('game',false);
+	toggleScreen('indicators', false);
 	toggleScreen('options-screen',false);
 	toggleScreen('mode-screen',false);
 	toggleScreen('song-screen',false);
@@ -512,6 +530,7 @@ function toOptionsMenu(){
 	toggleScreen('start-screen',false);
 	toggleScreen('gameover-screen',false);
 	toggleScreen('game',false);
+	toggleScreen('indicators', false);
 	toggleScreen('options-screen',true);
 	toggleScreen('mode-screen',false);
 	toggleScreen('song-screen',false);
@@ -521,6 +540,7 @@ function toGameOverMenu(){
 	toggleScreen('start-screen',false);
 	toggleScreen('gameover-screen',true);
 	toggleScreen('game',false);
+	toggleScreen('indicators', false);
 	toggleScreen('options-screen',false);
 	toggleScreen('mode-screen',false);
 	toggleScreen('song-screen',false);
@@ -530,6 +550,7 @@ function toModeMenu(){
 	toggleScreen('start-screen',false);
 	toggleScreen('gameover-screen',false);
 	toggleScreen('game',false);
+	toggleScreen('indicators', false);
 	toggleScreen('options-screen',false);
 	toggleScreen('mode-screen',true);
 	toggleScreen('song-screen',false);
@@ -539,9 +560,57 @@ function toSongMenu(){
 	toggleScreen('start-screen',false);
 	toggleScreen('gameover-screen',false);
 	toggleScreen('game',false);
+	toggleScreen('indicators', false);
 	toggleScreen('options-screen',false);
 	toggleScreen('mode-screen',false);
 	toggleScreen('song-screen',true);
+}
+/*
+	let easyIntervals = [0,1,2,3,4,5,7,12,-1,-2,-3,-4,-5,-7,-12];
+	let normalIntervals = [0,1,2,3,4,5,7,9,11,12,-1,-2,-3,-4,-5,-7,-9,-11,-12];
+	let hardIntervals = [0,1,2,3,4,5,6,7,8,9,10,11,12,-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12];*/
+
+
+function selectDifficulty(diff){
+	switch(diff){
+		case 1 : //EASY
+			ObVel = 5.5;
+			charToTargetVelocity = 0.5;
+			errorMargin = 30;
+			maxInterval = 7;
+			intervalsVector = [0,1,2,3,4,5,7,12,-1,-2,-3,-4,-5,-7,-12];
+			break;
+		case 2: //NORMAL
+			ObVel = 4;
+			charToTargetVelocity = 0.4;
+			errorMargin = 22;
+			maxInterval = 12;
+			intervalsVector = [0,1,2,3,4,5,7,9,11,12,-1,-2,-3,-4,-5,-7,-9,-11,-12];
+			break;
+		case 3: //HARD
+			ObVel = 3;
+			charToTargetVelocity = 0.2;
+			errorMargin = 16;
+			intervalsVector = [0,1,2,3,4,5,6,7,8,9,10,11,12,-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12];
+			break;
+		case 4: //SPEEDFREAK
+			ObVel = 1.5;
+			charToTargetVelocity = 0.1;
+			errorMargin = 16;
+			intervalsVector = [0,1,2,3,4,5,6,7,8,9,10,11,12,-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12];
+			break;
+		case 5: //PERFECTPITCH
+			ObVel = 4;
+			charToTargetVelocity = 0.25;
+			errorMargin = 3;
+			intervalsVector = [0,1,2,3,4,5,6,7,8,9,10,11,12,-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12];
+			break;
+		default:
+			ObVel = 4;
+			charToTargetVelocity = 0.4;
+			errorMargin = 30;
+	}
+	starting();
 }
 
 function selectSong(song_number){
@@ -564,7 +633,48 @@ function selectSong(song_number){
 
 function setRandom(){
 	mode = true;
-	starting();
+
+	let diff1 = document.createElement("li");
+	let diff2 = document.createElement("li");
+	let diff3 = document.createElement("li");
+	let diff4 = document.createElement("li");
+	let diff5 = document.createElement("li");
+	
+	var ul = document.getElementById("mode_list");
+
+	diff1.className = "button";
+	diff2.className = "button";
+	diff3.className = "button";
+	diff4.className = "button";
+	diff5.className = "button";
+
+
+
+	diff1.onclick = function() { selectDifficulty(1); };
+	diff2.onclick = function() { selectDifficulty(2); };
+	diff3.onclick = function() { selectDifficulty(3); };
+	diff4.onclick = function() { selectDifficulty(4); };
+	diff5.onclick = function() { selectDifficulty(5); };
+
+	/*diff1.setAttribute("onclick",selectDifficulty(1));
+	diff2.setAttribute("onclick",selectDifficulty(2));
+	diff3.setAttribute("onclick",selectDifficulty(3));
+	diff4.setAttribute("onclick",selectDifficulty(4));*/
+
+
+	diff1.appendChild(document.createTextNode("Easy"));
+	diff2.appendChild(document.createTextNode("Normal"));
+	diff3.appendChild(document.createTextNode("Hard"));
+	diff4.appendChild(document.createTextNode("SpeedFreak"));
+	diff5.appendChild(document.createTextNode("PerfectPitch"));
+
+  	ul.appendChild(diff1);
+	ul.appendChild(diff2);
+	ul.appendChild(diff3);
+	ul.appendChild(diff4);
+	ul.appendChild(diff5);
+
+	//starting();
 }
 
 function charSpeedUpdate(value){

@@ -18,7 +18,7 @@
 		<!-- GAME MODE MENU -->
 		<div id = "mode-screen" class = "menu screen" style="display:none">
 			<h1 class = "title">Choose Game Mode</h1>
-			<ul>
+			<ul id = "mode_list">
 				<li class = "button button--song" onclick="toSongMenu()">Song</li>
 				<li class = "button button--random" onclick="setRandom()">Random</li>
 				<li class = "button button--back" onclick="toMainMenu()">Back</li>
@@ -85,11 +85,13 @@
 				<li class = "button button--main-menu" onclick="toMainMenu()">Main Menu</li>
 		</div>
 		
+		<div id = "indicators" style ="display:none">
+			<span id="note">--</span>
+			<span id="freq">--</span>
+			<span id="score">score: </span>
+		</div>
 		
-		<span id="note">--</span>
-		<span id="freq">--</span>
-		<span id="score">score: </span>
-
+		<!--GAME-->
 		<div id="game" style="display:none">
 			<div id="targetNote"></div>
 			<div id="targetNote2"></div>
