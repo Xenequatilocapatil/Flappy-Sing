@@ -46,8 +46,8 @@ let canvasHeight = 572;
 let charHeight = 60;
 let PxSemitone = 16; //pixxel a semitono
 let errorMargin = 20; //pixxel che separano il personaggio dagli ostacoli supponendo una perfetta intonazione
-let lowerNoteLimit = 4; //G2 = 0; default to B2 = 4
-let noteExtension = 24; //default to B2+24 = B4; Max possible note is G5
+let lowerNoteLimit = 5; //G2 = 0; default to B2 = 4
+let noteExtension = 22; //default to B2+24 = B4; Max possible note is G5
 let maxInterval = 12;
 let collisionDetection = true; //Disables collision flag (one time playing)
 let intervalsVector = [];
@@ -124,13 +124,6 @@ function autoCorrelate(buf, sampleRate) {
 }
 
 
-//Screen functions
-function toggleScreen(id,toggle){
-	let element = document.getElementById(id);
-	let display = ( toggle ) ? 'block' : 'none' ;
-	element.style.display = display;
-}
-
 function gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2){
 
 	//STOP OSCILLATORS!!
@@ -171,7 +164,7 @@ function gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2){
 	//Variables reset
 	insideObstacle = false;
 	allowMovement = 0;
-	series = 0;
+	series = 1;
 	score = 0;
 	oldNote = 14;
 	scoreElem.innerHTML = `score: ${score}`;
@@ -190,28 +183,11 @@ function GenerationHoleRandom(ObB, ObT, targetNote){
 	ObT.style.animation = 'obstacle ' + ObVel + 's linear';
 	ObB.style.animation = 'obstacle ' + ObVel + 's linear';
 
-	//let randomNote = Math.round(Math.random() * noteExtension) + lowerNoteLimit; //escludo le 4 note più alte e le 4 più basse => 32-8 
-
 	let randomInterval = intervalsVector[Math.round(Math.random() * (intervalsVector.length-1))]
 	let randomNote = oldNote + randomInterval ;
 	if ((randomNote < lowerNoteLimit) || (randomNote > (lowerNoteLimit + noteExtension))){
 		randomNote = oldNote - randomInterval;
 	}
-	console.log("old: ");
-	console.log(oldNote);
-	console.log("random:");
-	console.log(randomNote);
-	//Evito di generare intervalli maggiori di un'ottava
-	/*
-	if(oldNote != null){
-		let intervalDiff = randomNote - oldNote;
-		if(intervalDiff > maxInterval){ 
-			randomNote = randomNote - (intervalDiff - intervalDiff%maxInterval);
-		}else if(intervalDiff < -maxInterval){
-			randomNote = randomNote + (intervalDiff - intervalDiff%maxInterval);
-		}
-	}*/
-	
 
 	ObB.style.height = randomNote * PxSemitone - errorMargin + "px";
 	ObT.style.height = canvasHeight - randomNote * PxSemitone - charHeight - errorMargin + "px";
@@ -506,6 +482,13 @@ window.addEventListener("load", () => {
 	navigator.mediaDevices.getUserMedia({audio: true}).then(gotStream);
 });
 
+//Screen functions
+function toggleScreen(id,toggle){
+	let element = document.getElementById(id);
+	let display = ( toggle ) ? 'block' : 'none' ;
+	element.style.display = display;
+}
+
 function toStartingScreen(){
 	toggleScreen('start-screen',false);
 	toggleScreen('gameover-screen',false);
@@ -514,6 +497,7 @@ function toStartingScreen(){
 	toggleScreen('options-screen',false);
 	toggleScreen('mode-screen',false);
 	toggleScreen('song-screen',false);
+	toggleScreen('diff-screen',false);
 }
 
 function toMainMenu(){
@@ -524,6 +508,7 @@ function toMainMenu(){
 	toggleScreen('options-screen',false);
 	toggleScreen('mode-screen',false);
 	toggleScreen('song-screen',false);
+	toggleScreen('diff-screen',false);
 }
 
 function toOptionsMenu(){
@@ -534,6 +519,7 @@ function toOptionsMenu(){
 	toggleScreen('options-screen',true);
 	toggleScreen('mode-screen',false);
 	toggleScreen('song-screen',false);
+	toggleScreen('diff-screen',false);
 }
 
 function toGameOverMenu(){
@@ -544,6 +530,7 @@ function toGameOverMenu(){
 	toggleScreen('options-screen',false);
 	toggleScreen('mode-screen',false);
 	toggleScreen('song-screen',false);
+	toggleScreen('diff-screen',false);
 }
 
 function toModeMenu(){
@@ -554,6 +541,17 @@ function toModeMenu(){
 	toggleScreen('options-screen',false);
 	toggleScreen('mode-screen',true);
 	toggleScreen('song-screen',false);
+	toggleScreen('diff-screen',false);
+}
+function toDiffMenu(){
+	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',false);
+	toggleScreen('game',false);
+	toggleScreen('indicators', false);
+	toggleScreen('options-screen',false);
+	toggleScreen('mode-screen',false);
+	toggleScreen('song-screen',false);
+	toggleScreen('diff-screen',true);
 }
 
 function toSongMenu(){
@@ -564,14 +562,12 @@ function toSongMenu(){
 	toggleScreen('options-screen',false);
 	toggleScreen('mode-screen',false);
 	toggleScreen('song-screen',true);
+	toggleScreen('diff-screen',false);
 }
-/*
-	let easyIntervals = [0,1,2,3,4,5,7,12,-1,-2,-3,-4,-5,-7,-12];
-	let normalIntervals = [0,1,2,3,4,5,7,9,11,12,-1,-2,-3,-4,-5,-7,-9,-11,-12];
-	let hardIntervals = [0,1,2,3,4,5,6,7,8,9,10,11,12,-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12];*/
 
 
 function selectDifficulty(diff){
+	mode = true;
 	switch(diff){
 		case 1 : //EASY
 			ObVel = 5.5;
@@ -631,7 +627,7 @@ function selectSong(song_number){
 	starting();
 }
 
-function setRandom(){
+/*function setRandom(){
 	mode = true;
 
 	let diff1 = document.createElement("li");
@@ -656,10 +652,6 @@ function setRandom(){
 	diff4.onclick = function() { selectDifficulty(4); };
 	diff5.onclick = function() { selectDifficulty(5); };
 
-	/*diff1.setAttribute("onclick",selectDifficulty(1));
-	diff2.setAttribute("onclick",selectDifficulty(2));
-	diff3.setAttribute("onclick",selectDifficulty(3));
-	diff4.setAttribute("onclick",selectDifficulty(4));*/
 
 
 	diff1.appendChild(document.createTextNode("Easy"));
@@ -675,7 +667,7 @@ function setRandom(){
 	ul.appendChild(diff5);
 
 	//starting();
-}
+}*/
 
 function charSpeedUpdate(value){
 	charFallVelocity = value;

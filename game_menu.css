@@ -3,7 +3,7 @@
 }
 
 .title{
-    color: white;
+    color: rgb(24, 5, 5);
     margin: 30px auto;
     text-align: center;
     text-shadow: black 0 0 20px;
@@ -50,4 +50,24 @@
 
 .button--third{
     top: 350px;
+}
+
+#back{
+    background-image: url(Back.png);
+    background-size: 100% 100%;
+    width: 80px;
+    height: 60px;
+    position: absolute;
+    top: 20px;
+    left: 10px;
+}
+
+#option{
+    background-image: url(option.png);
+    background-size: 100% 100%;
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    top: 20px;
+    right: 25px;
 }
