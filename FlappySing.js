@@ -1,7 +1,5 @@
 "use strict";
-
-import { autoCorrelate } from "./AutoCorrelate";
-import { toDiffMenu, toGameOverMenu, toMainMenu, toModeMenu, toOptionsMenu, toSongMenu, toStartingScreen, toggleScreen } from "./ChangeMenu";
+//import { autoCorrelate } from "./AutoCorrelate";
 
 let audioContext = null; //will be created on page load
 //Filter section: 90 - 1k bandpass
@@ -49,7 +47,8 @@ let charHeight = 60;
 let PxSemitone = 16; //pixxel a semitono
 let errorMargin = 20; //pixxel che separano il personaggio dagli ostacoli supponendo una perfetta intonazione
 let lowerNoteLimit = 5; //G2 = 0; default to B2 = 4
-let upperNoteLimit = 27; //default to B2+24 = B4; Max possible note is G5
+let noteExtension = 22; //default to B2+24 = B4; Max possible note is G5
+let maxInterval = 12;
 let collisionDetection = true; //Disables collision flag (one time playing)
 let intervalsVector = [];
 
@@ -74,6 +73,55 @@ ObBElem = document.getElementById("obstacleB");
 ObT2Elem = document.getElementById("obstacleT2");
 ObB2Elem = document.getElementById("obstacleB2");
 scoreElem = document.getElementById("score");
+
+
+//Autocorrelation algorithm
+function autoCorrelate(buf, sampleRate) {
+	// Implements the ACF2+ algorithm
+	let SIZE = buf.length;
+	let rms = 0;
+
+	for (let i = 0; i < SIZE; i++) {
+		const val = buf[i];
+		rms += val * val;
+	}
+	rms = Math.sqrt(rms / SIZE);
+	if (rms < 0.01) // not enough signal
+		return -1;
+
+	var r1 = 0, r2 = SIZE - 1, thres = 0.2;
+	for (var i = 0; i < SIZE / 2; i++)
+		if (Math.abs(buf[i]) < thres) { r1 = i; break; }
+	for (var i = 1; i < SIZE / 2; i++)
+		if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
+
+	buf = buf.slice(r1, r2);
+	SIZE = buf.length;
+
+	let c = new Array(SIZE).fill(0);
+	for (var i = 0; i < SIZE; i++)
+		for (let j = 0; j < SIZE - i; j++)
+			c[i] = c[i] + buf[j] * buf[j + i];
+
+	let d = 0; while (c[d] > c[d + 1])
+		d++;
+	let maxval = -1, maxpos = -1;
+	for (let i = d; i < SIZE; i++) {
+		if (c[i] > maxval) {
+			maxval = c[i];
+			maxpos = i;
+		}
+	}
+	let T0 = maxpos;
+
+	let x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
+	let a = (x1 + x3 - 2 * x2) / 2;
+	let b = (x3 - x1) / 2;
+	if (a)
+		T0 = T0 - b / (2 * a);
+
+	return sampleRate / T0;
+}
 
 
 function gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2){
@@ -137,7 +185,7 @@ function GenerationHoleRandom(ObB, ObT, targetNote){
 
 	let randomInterval = intervalsVector[Math.round(Math.random() * (intervalsVector.length-1))]
 	let randomNote = oldNote + randomInterval ;
-	if ((randomNote < lowerNoteLimit) || (randomNote > upperNoteLimit)){
+	if ((randomNote < lowerNoteLimit) || (randomNote > (lowerNoteLimit + noteExtension))){
 		randomNote = oldNote - randomInterval;
 	}
 
@@ -248,6 +296,23 @@ function starting() {
 			GenerationObstacle2(choosenSong, mode)
 		}, ObVel*1000);
 	}, ObVel/2 * 1000); 
+
+	/*
+	if(pitchGuiding){
+		currentPitch[0] = pitch1; //Force first
+		if(currentPitch[0] != null)
+			oscPlay(currentPitch[0]);
+	}*/
+	//START PLAYING CURRENT PITCH = PITCH1
+
+	//Old code
+	/*ObBElem.addEventListener('animationend', () => {
+			GenerationObstacle(choosenSong, mode);
+	});
+
+	ObB2Elem.addEventListener('animationend', () => {
+			GenerationObstacle2(choosenSong, mode);
+	});*/
 
 	var refreshIntervalID = setInterval(function(){ 
 		let ObstacleTLeft = parseInt(window.getComputedStyle(ObTElem).getPropertyValue("left"))+15;
@@ -417,6 +482,90 @@ window.addEventListener("load", () => {
 	navigator.mediaDevices.getUserMedia({audio: true}).then(gotStream);
 });
 
+//Screen functions
+function toggleScreen(id,toggle){
+	let element = document.getElementById(id);
+	let display = ( toggle ) ? 'block' : 'none' ;
+	element.style.display = display;
+}
+
+function toStartingScreen(){
+	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',false);
+	toggleScreen('game',true);
+	toggleScreen('indicators', true);
+	toggleScreen('options-screen',false);
+	toggleScreen('mode-screen',false);
+	toggleScreen('song-screen',false);
+	toggleScreen('diff-screen',false);
+}
+
+function toMainMenu(){
+	toggleScreen('start-screen',true);
+	toggleScreen('gameover-screen',false);
+	toggleScreen('game',false);
+	toggleScreen('indicators', false);
+	toggleScreen('options-screen',false);
+	toggleScreen('mode-screen',false);
+	toggleScreen('song-screen',false);
+	toggleScreen('diff-screen',false);
+}
+
+function toOptionsMenu(){
+	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',false);
+	toggleScreen('game',false);
+	toggleScreen('indicators', false);
+	toggleScreen('options-screen',true);
+	toggleScreen('mode-screen',false);
+	toggleScreen('song-screen',false);
+	toggleScreen('diff-screen',false);
+}
+
+function toGameOverMenu(){
+	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',true);
+	toggleScreen('game',false);
+	toggleScreen('indicators', false);
+	toggleScreen('options-screen',false);
+	toggleScreen('mode-screen',false);
+	toggleScreen('song-screen',false);
+	toggleScreen('diff-screen',false);
+}
+
+function toModeMenu(){
+	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',false);
+	toggleScreen('game',false);
+	toggleScreen('indicators', false);
+	toggleScreen('options-screen',false);
+	toggleScreen('mode-screen',true);
+	toggleScreen('song-screen',false);
+	toggleScreen('diff-screen',false);
+}
+function toDiffMenu(){
+	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',false);
+	toggleScreen('game',false);
+	toggleScreen('indicators', false);
+	toggleScreen('options-screen',false);
+	toggleScreen('mode-screen',false);
+	toggleScreen('song-screen',false);
+	toggleScreen('diff-screen',true);
+}
+
+function toSongMenu(){
+	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',false);
+	toggleScreen('game',false);
+	toggleScreen('indicators', false);
+	toggleScreen('options-screen',false);
+	toggleScreen('mode-screen',false);
+	toggleScreen('song-screen',true);
+	toggleScreen('diff-screen',false);
+}
+
+
 function selectDifficulty(diff){
 	mode = true;
 	switch(diff){
@@ -424,12 +573,14 @@ function selectDifficulty(diff){
 			ObVel = 5.5;
 			charToTargetVelocity = 0.5;
 			errorMargin = 30;
+			maxInterval = 7;
 			intervalsVector = [0,1,2,3,4,5,7,12,-1,-2,-3,-4,-5,-7,-12];
 			break;
 		case 2: //NORMAL
 			ObVel = 4;
 			charToTargetVelocity = 0.4;
 			errorMargin = 22;
+			maxInterval = 12;
 			intervalsVector = [0,1,2,3,4,5,7,9,11,12,-1,-2,-3,-4,-5,-7,-9,-11,-12];
 			break;
 		case 3: //HARD
@@ -451,10 +602,9 @@ function selectDifficulty(diff){
 			intervalsVector = [0,1,2,3,4,5,6,7,8,9,10,11,12,-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12];
 			break;
 		default:
-			ObVel = 5.5;
-			charToTargetVelocity = 0.5;
+			ObVel = 4;
+			charToTargetVelocity = 0.4;
 			errorMargin = 30;
-			intervalsVector = [0,1,2,3,4,5,7,12,-1,-2,-3,-4,-5,-7,-12];
 	}
 	starting();
 }
@@ -477,8 +627,48 @@ function selectSong(song_number){
 	starting();
 }
 
-//GENERAL OPTIONS
-/*
+/*function setRandom(){
+	mode = true;
+
+	let diff1 = document.createElement("li");
+	let diff2 = document.createElement("li");
+	let diff3 = document.createElement("li");
+	let diff4 = document.createElement("li");
+	let diff5 = document.createElement("li");
+	
+	var ul = document.getElementById("mode_list");
+
+	diff1.className = "button";
+	diff2.className = "button";
+	diff3.className = "button";
+	diff4.className = "button";
+	diff5.className = "button";
+
+
+
+	diff1.onclick = function() { selectDifficulty(1); };
+	diff2.onclick = function() { selectDifficulty(2); };
+	diff3.onclick = function() { selectDifficulty(3); };
+	diff4.onclick = function() { selectDifficulty(4); };
+	diff5.onclick = function() { selectDifficulty(5); };
+
+
+
+	diff1.appendChild(document.createTextNode("Easy"));
+	diff2.appendChild(document.createTextNode("Normal"));
+	diff3.appendChild(document.createTextNode("Hard"));
+	diff4.appendChild(document.createTextNode("SpeedFreak"));
+	diff5.appendChild(document.createTextNode("PerfectPitch"));
+
+  	ul.appendChild(diff1);
+	ul.appendChild(diff2);
+	ul.appendChild(diff3);
+	ul.appendChild(diff4);
+	ul.appendChild(diff5);
+
+	//starting();
+}*/
+
 function charSpeedUpdate(value){
 	charFallVelocity = value;
 	charToTargetVelocity = charFallVelocity/14;
@@ -487,7 +677,6 @@ function charSpeedUpdate(value){
 function obstacleSpeedUpdate(value){
 	ObVel = value;
 }
-*/
 
 function updateGuidePitch(){
 	let checkbox = document.getElementById('pitch_guiding');
@@ -507,6 +696,3 @@ function updateDisableCollision(){
 	}
 }
 
-window.optionFunctions = {updateGuidePitch, updateDisableCollision};
-window.changeMenu = {toDiffMenu, toGameOverMenu, toMainMenu, toModeMenu, toOptionsMenu, toSongMenu, toStartingScreen, toggleScreen};
-window.otherSelections = {selectSong,selectDifficulty,starting};
