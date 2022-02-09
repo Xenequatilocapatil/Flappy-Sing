@@ -1,0 +1,83 @@
+
+
+<label for="char_speed">Character Speed</label>
+<input type="range"
+    id="char_speed"
+    min="0.5"
+    max="10"
+    value="4"
+    step="0.5"
+    aria-valuemin="1"
+    aria-valuemax="10"
+    aria-valuenow="4"
+oninput="window.optionFunctions.charSpeedUpdate(value)">
+
+<label for="ob_speed">Obstacle Speed</label>
+<input type="range"
+    id="ob_speed"
+    min="0.5"
+    max="10"
+    value="4"
+    step="0.5"
+    aria-valuemin="1"
+    aria-valuemax="10"
+    aria-valuenow="4"
+oninput="window.optionFunctions.obstacleSpeedUpdate(value)">
+
+
+
+function setRandom(){
+	mode = true;
+
+	let diff1 = document.createElement("li");
+	let diff2 = document.createElement("li");
+	let diff3 = document.createElement("li");
+	let diff4 = document.createElement("li");
+	let diff5 = document.createElement("li");
+	
+	var ul = document.getElementById("mode_list");
+
+	diff1.className = "button";
+	diff2.className = "button";
+	diff3.className = "button";
+	diff4.className = "button";
+	diff5.className = "button";
+
+	diff1.onclick = function() { selectDifficulty(1); };
+	diff2.onclick = function() { selectDifficulty(2); };
+	diff3.onclick = function() { selectDifficulty(3); };
+	diff4.onclick = function() { selectDifficulty(4); };
+	diff5.onclick = function() { selectDifficulty(5); };
+
+	diff1.appendChild(document.createTextNode("Easy"));
+	diff2.appendChild(document.createTextNode("Normal"));
+	diff3.appendChild(document.createTextNode("Hard"));
+	diff4.appendChild(document.createTextNode("SpeedFreak"));
+	diff5.appendChild(document.createTextNode("PerfectPitch"));
+
+    ul.appendChild(diff1);
+    ul.appendChild(diff2);
+    ul.appendChild(diff3);
+    ul.appendChild(diff4);
+    ul.appendChild(diff5);
+
+	//starting();
+}
+
+
+if(pitchGuiding){
+    currentPitch[0] = pitch1; //Force first
+    if(currentPitch[0] != null)
+        oscPlay(currentPitch[0]);
+}*/
+//START PLAYING CURRENT PITCH = PITCH1
+
+//Old code
+/*ObBElem.addEventListener('animationend', () => {
+        GenerationObstacle(choosenSong, mode);
+});
+
+ObB2Elem.addEventListener('animationend', () => {
+        GenerationObstacle2(choosenSong, mode);
+});
+

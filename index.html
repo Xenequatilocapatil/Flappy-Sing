@@ -7,85 +7,63 @@
 	</head>
     <body>
 		
+		
 		<!-- MAIN MENU -->
 		<div id = "start-screen" class = "menu screen" style="display:block">
 			<h1 class = "title">Flappy Sing</h1>
 			<ul>
-				<li class = "button button--play" onclick="toModeMenu()">Play</li>
-				<div id = "option" onclick="toOptionsMenu()"></div>
+				<li class = "button button--play" onclick="window.changeMenu.toModeMenu()">Play</li>
+				<div id = "option" onclick="window.changeMenu.toOptionsMenu()"></div>
 		</div>
 
 		<!-- GAME MODE MENU -->
 		<div id = "mode-screen" class = "menu screen" style="display:none">
 			<h1 class = "title">Choose Game Mode</h1>
 			<ul id = "mode_list">
-				<li class = "button button--easy" onclick="toSongMenu()">Song</li>
-				<li class = "button button--random" onclick="toDiffMenu()">Random</li>
-				<div id = "back" onclick="toMainMenu()"></div>
+				<li class = "button button--easy" onclick="window.changeMenu.toSongMenu()">Song</li>
+				<li class = "button button--random" onclick="window.changeMenu.toDiffMenu()">Random</li>
+				<div id = "back" onclick="window.changeMenu.toMainMenu()"></div>
 		</div>
 
 		<!-- DIFFICULTY MENU -->
 		<div id = "diff-screen" class = "menu screen" style="display:none">
 			<h1 class = "title">Choose Difficulty</h1>
 			<ul id = "diff_list">
-				<li class = "button button--easy" onclick="selectDifficulty(1)">Easy</li>
-				<li class = "button button--normal" onclick="selectDifficulty(2)">Normal</li>
-				<li class = "button button--hard" onclick="selectDifficulty(3)">Hard</li>
-				<li class = "button button--speadfreak" onclick="selectDifficulty(4)">SpeedFreak</li>
-				<li class = "button button--perfectpitch" onclick="selectDifficulty(5)">PerfectPitch</li>
-				<div id = "back" onclick="toModeMenu()"></div>
+				<li class = "button button--easy" onclick="window.otherSelections.selectDifficulty(1)">Easy</li>
+				<li class = "button button--normal" onclick="window.otherSelections.selectDifficulty(2)">Normal</li>
+				<li class = "button button--hard" onclick="window.otherSelections.selectDifficulty(3)">Hard</li>
+				<li class = "button button--speadfreak" onclick="window.otherSelections.selectDifficulty(4)">SpeedFreak</li>
+				<li class = "button button--perfectpitch" onclick="window.otherSelections.selectDifficulty(5)">PerfectPitch</li>
+				<div id = "back" onclick="window.changeMenu.toModeMenu()"></div>
 		</div>
 
 		<!-- SONG MENU -->
 		<div id = "song-screen" class = "menu screen" style="display:none">
 			<h1 class = "title">Choose song</h1>
 			<ul>
-				<li class = "button button--s1" onclick="selectSong(1)">Fra Martino</li>
-				<li class = "button button--s2" onclick="selectSong(2)">Per Elisa</li>
-				<li class = "button button--s3" onclick="selectSong(3)">Halo</li>
-				<div id = "back" onclick="toModeMenu()"></div>
+				<li class = "button button--s1" onclick="window.otherSelections.selectSong(1)">Fra Martino</li>
+				<li class = "button button--s2" onclick="window.otherSelections.selectSong(2)">Per Elisa</li>
+				<li class = "button button--s3" onclick="window.otherSelections.selectSong(3)">Halo</li>
+				<div id = "back" onclick="window.changeMenu.toModeMenu()"></div>
 		</div>
 
 		<!-- OPTIONS MENU -->
 		<div id = "options-screen" class="menu screen" style="display:none">
-			<label for="char_speed">Character Speed</label>
-			<input type="range"
-				id="char_speed"
-				min="0.5"
-				max="10"
-				value="4"
-				step="0.5"
-				aria-valuemin="1"
-				aria-valuemax="10"
-				aria-valuenow="4"
-			oninput="charSpeedUpdate(value)">
-
-			<label for="ob_speed">Obstacle Speed</label>
-			<input type="range"
-				id="ob_speed"
-				min="0.5"
-				max="10"
-				value="4"
-				step="0.5"
-				aria-valuemin="1"
-				aria-valuemax="10"
-				aria-valuenow="4"
-			oninput="obstacleSpeedUpdate(value)">
 			
 			<label for="pitch_guiding">Guide Pitch</label>
 			<input type = "checkbox"
 				id = "pitch_guiding"
 				name = "Guide Pitch"
-			onchange="updateGuidePitch()">
+			onchange="window.optionFunctions.updateGuidePitch()">
 
 			<label for="disable_collision">Disable Collision</label>
 			<input type = "checkbox"
 				id = "disable_collision"
 				name = "Disable Collision"
-			onchange="updateDisableCollision()">
+			onchange="window.optionFunctions.updateDisableCollision()">
 
 			<ul>
-				<div id = "back" onclick="toMainMenu()"></div>
+				<div id = "back" onclick="window.changeMenu.toMainMenu()"></div>
 
 		</div>
 
@@ -93,8 +71,8 @@
 		<div id = "gameover-screen" class="menu screen" style="display:none">
 			<h1 class = "title">Game Over!</h1>
 			<ul>
-				<li class = "button button--retry" onclick="starting()">Retry</li>
-				<li class = "button button--main-menu" onclick="toMainMenu()">Main Menu</li>
+				<li class = "button button--retry" onclick="window.otherSelections.starting()">Retry</li>
+				<li class = "button button--main-menu" onclick="window.changeMenu.toMainMenu()">Main Menu</li>
 		</div>
 		
 		<div id = "indicators" style ="display:none">
@@ -114,6 +92,7 @@
 			<div id="obstacleB2"></div>
 		</div>
 		
-		<script src="FlappySing.js"></script>
+		<script src="FlappySing.js" type="module"></script>
+
     </body>
 </html>
