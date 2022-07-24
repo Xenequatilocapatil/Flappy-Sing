@@ -19,11 +19,13 @@ let ObBElem = null;
 let ObT2Elem = null;
 let ObB2Elem = null;
 let scoreElem = null;
+let scoreElem_2 = null;
 let targetNoteElem = null;
 let targetNote2Elem = null;
 let score = 0;
 let insideObstacle = false;
 let series = 0;
+let temp_score = 0;
 let oldBuff = [];
 let allowMovement = 0
 let oldNote = 14;
@@ -73,6 +75,55 @@ ObBElem = document.getElementById("obstacleB");
 ObT2Elem = document.getElementById("obstacleT2");
 ObB2Elem = document.getElementById("obstacleB2");
 scoreElem = document.getElementById("score");
+scoreElem_2 = document.getElementById("score_2");
+
+//Autocorrelation algorithm
+function autoCorrelate(buf, sampleRate) {
+	// Implements the ACF2+ algorithm
+	let SIZE = buf.length;
+	let rms = 0;
+
+	for (let i = 0; i < SIZE; i++) {
+		const val = buf[i];
+		rms += val * val;
+	}
+	rms = Math.sqrt(rms / SIZE);
+	if (rms < 0.01) // not enough signal
+		return -1;
+
+	var r1 = 0, r2 = SIZE - 1, thres = 0.2;
+	for (var i = 0; i < SIZE / 2; i++)
+		if (Math.abs(buf[i]) < thres) { r1 = i; break; }
+	for (var i = 1; i < SIZE / 2; i++)
+		if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
+
+	buf = buf.slice(r1, r2);
+	SIZE = buf.length;
+
+	let c = new Array(SIZE).fill(0);
+	for (var i = 0; i < SIZE; i++)
+		for (let j = 0; j < SIZE - i; j++)
+			c[i] = c[i] + buf[j] * buf[j + i];
+
+	let d = 0; while (c[d] > c[d + 1])
+		d++;
+	let maxval = -1, maxpos = -1;
+	for (let i = d; i < SIZE; i++) {
+		if (c[i] > maxval) {
+			maxval = c[i];
+			maxpos = i;
+		}
+	}
+	let T0 = maxpos;
+
+	let x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
+	let a = (x1 + x3 - 2 * x2) / 2;
+	let b = (x3 - x1) / 2;
+	if (a)
+		T0 = T0 - b / (2 * a);
+
+	return sampleRate / T0;
+}
 
 
 //Autocorrelation algorithm
@@ -165,7 +216,6 @@ function gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2){
 	insideObstacle = false;
 	allowMovement = 0;
 	series = 1;
-	score = 0;
 	oldNote = 14;
 	scoreElem.innerHTML = `score: ${score}`;
 	
@@ -349,11 +399,19 @@ function starting() {
 			if(((ObstacleTLeft && ObstacleBLeft) < 100) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {
 				if((charY < ObstacleBTop) || (charY > canvasHeight-charHeight - ObstacleTBottom)){
 					gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2);
+					temp_score = score;
+					scoreElem_2.innerHTML = `score: ${temp_score}`;
+					score = 0;
+					scoreElem.innerHTML = `score: ${score}`;
 				}
 			}
 			if(((ObstacleT2Left && ObstacleB2Left) < 100) && ((ObstacleT2Left && ObstacleB2Left) > 50)) {
 				if((charY < ObstacleB2Top) || (charY > canvasHeight-charHeight - ObstacleT2Bottom)){
 					gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2);
+					temp_score = score;
+					scoreElem_2.innerHTML = `score: ${temp_score}`;
+					score = 0;
+					scoreElem.innerHTML = `score: ${score}`;
 				}
 			}
 		}
@@ -491,7 +549,11 @@ function toggleScreen(id,toggle){
 
 function toStartingScreen(){
 	toggleScreen('start-screen',false);
+<<<<<<< Updated upstream
 	toggleScreen('gameover-screen',false);
+=======
+	toggleScreen('gameover',false);
+>>>>>>> Stashed changes
 	toggleScreen('game',true);
 	toggleScreen('indicators', true);
 	toggleScreen('options-screen',false);
@@ -502,7 +564,11 @@ function toStartingScreen(){
 
 function toMainMenu(){
 	toggleScreen('start-screen',true);
+<<<<<<< Updated upstream
 	toggleScreen('gameover-screen',false);
+=======
+	toggleScreen('gameover',false);
+>>>>>>> Stashed changes
 	toggleScreen('game',false);
 	toggleScreen('indicators', false);
 	toggleScreen('options-screen',false);
@@ -513,7 +579,11 @@ function toMainMenu(){
 
 function toOptionsMenu(){
 	toggleScreen('start-screen',false);
+<<<<<<< Updated upstream
 	toggleScreen('gameover-screen',false);
+=======
+	toggleScreen('gameover',false);
+>>>>>>> Stashed changes
 	toggleScreen('game',false);
 	toggleScreen('indicators', false);
 	toggleScreen('options-screen',true);
@@ -524,8 +594,13 @@ function toOptionsMenu(){
 
 function toGameOverMenu(){
 	toggleScreen('start-screen',false);
+<<<<<<< Updated upstream
 	toggleScreen('gameover-screen',true);
 	toggleScreen('game',false);
+=======
+	toggleScreen('gameover',true);
+	toggleScreen('game',true);
+>>>>>>> Stashed changes
 	toggleScreen('indicators', false);
 	toggleScreen('options-screen',false);
 	toggleScreen('mode-screen',false);
@@ -535,7 +610,11 @@ function toGameOverMenu(){
 
 function toModeMenu(){
 	toggleScreen('start-screen',false);
+<<<<<<< Updated upstream
 	toggleScreen('gameover-screen',false);
+=======
+	toggleScreen('gameover',false);
+>>>>>>> Stashed changes
 	toggleScreen('game',false);
 	toggleScreen('indicators', false);
 	toggleScreen('options-screen',false);
@@ -545,7 +624,11 @@ function toModeMenu(){
 }
 function toDiffMenu(){
 	toggleScreen('start-screen',false);
+<<<<<<< Updated upstream
 	toggleScreen('gameover-screen',false);
+=======
+	toggleScreen('gameover',false);
+>>>>>>> Stashed changes
 	toggleScreen('game',false);
 	toggleScreen('indicators', false);
 	toggleScreen('options-screen',false);
@@ -556,7 +639,11 @@ function toDiffMenu(){
 
 function toSongMenu(){
 	toggleScreen('start-screen',false);
+<<<<<<< Updated upstream
 	toggleScreen('gameover-screen',false);
+=======
+	toggleScreen('gameover',false);
+>>>>>>> Stashed changes
 	toggleScreen('game',false);
 	toggleScreen('indicators', false);
 	toggleScreen('options-screen',false);
