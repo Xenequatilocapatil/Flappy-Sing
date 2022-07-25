@@ -549,11 +549,7 @@ function toggleScreen(id,toggle){
 
 function toStartingScreen(){
 	toggleScreen('start-screen',false);
-<<<<<<< Updated upstream
-	toggleScreen('gameover-screen',false);
-=======
 	toggleScreen('gameover',false);
->>>>>>> Stashed changes
 	toggleScreen('game',true);
 	toggleScreen('indicators', true);
 	toggleScreen('options-screen',false);
@@ -564,11 +560,7 @@ function toStartingScreen(){
 
 function toMainMenu(){
 	toggleScreen('start-screen',true);
-<<<<<<< Updated upstream
-	toggleScreen('gameover-screen',false);
-=======
 	toggleScreen('gameover',false);
->>>>>>> Stashed changes
 	toggleScreen('game',false);
 	toggleScreen('indicators', false);
 	toggleScreen('options-screen',false);
@@ -579,11 +571,7 @@ function toMainMenu(){
 
 function toOptionsMenu(){
 	toggleScreen('start-screen',false);
-<<<<<<< Updated upstream
-	toggleScreen('gameover-screen',false);
-=======
 	toggleScreen('gameover',false);
->>>>>>> Stashed changes
 	toggleScreen('game',false);
 	toggleScreen('indicators', false);
 	toggleScreen('options-screen',true);
@@ -594,13 +582,8 @@ function toOptionsMenu(){
 
 function toGameOverMenu(){
 	toggleScreen('start-screen',false);
-<<<<<<< Updated upstream
-	toggleScreen('gameover-screen',true);
-	toggleScreen('game',false);
-=======
 	toggleScreen('gameover',true);
 	toggleScreen('game',true);
->>>>>>> Stashed changes
 	toggleScreen('indicators', false);
 	toggleScreen('options-screen',false);
 	toggleScreen('mode-screen',false);
@@ -610,11 +593,7 @@ function toGameOverMenu(){
 
 function toModeMenu(){
 	toggleScreen('start-screen',false);
-<<<<<<< Updated upstream
-	toggleScreen('gameover-screen',false);
-=======
 	toggleScreen('gameover',false);
->>>>>>> Stashed changes
 	toggleScreen('game',false);
 	toggleScreen('indicators', false);
 	toggleScreen('options-screen',false);
@@ -624,11 +603,7 @@ function toModeMenu(){
 }
 function toDiffMenu(){
 	toggleScreen('start-screen',false);
-<<<<<<< Updated upstream
-	toggleScreen('gameover-screen',false);
-=======
 	toggleScreen('gameover',false);
->>>>>>> Stashed changes
 	toggleScreen('game',false);
 	toggleScreen('indicators', false);
 	toggleScreen('options-screen',false);
@@ -639,11 +614,7 @@ function toDiffMenu(){
 
 function toSongMenu(){
 	toggleScreen('start-screen',false);
-<<<<<<< Updated upstream
-	toggleScreen('gameover-screen',false);
-=======
 	toggleScreen('gameover',false);
->>>>>>> Stashed changes
 	toggleScreen('game',false);
 	toggleScreen('indicators', false);
 	toggleScreen('options-screen',false);
