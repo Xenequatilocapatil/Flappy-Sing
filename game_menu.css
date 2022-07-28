@@ -52,6 +52,15 @@
     top: 350px;
 }
 
+#score_2{
+    color: rgb(24, 5, 5);
+    margin: 30px auto;
+    text-align: center;
+    text-shadow: black 0 0 20px;
+    font-size: 50px;
+    font-weight: bold;
+}
+
 #back{
     background-image: url(Back.png);
     background-size: 100% 100%;
@@ -60,6 +69,29 @@
     position: absolute;
     top: 20px;
     left: 10px;
+    cursor: pointer;
+}
+
+#home{
+    background-image: url(home_button.png);
+    background-size: 100% 100%;
+    width: 80px;
+    height: 80px;
+    position: absolute;
+    top: 130px;
+    left: 335px;
+    cursor: pointer;
+}
+
+#retry{
+    background-image: url(retry_button.png);
+    background-size: 100% 100%;
+    width: 80px;
+    height: 80px;
+    position: absolute;
+    top: 130px;
+    left: 435px;
+    cursor: pointer;
 }
 
 #option{
@@ -70,4 +102,25 @@
     position: absolute;
     top: 20px;
     right: 25px;
+    cursor: pointer;
+}
+
+@keyframes scrolling {
+    0% {width:0px;}
+    100% {width:850px;}
+}
+
+@keyframes scrollButtonHome {
+    0% {left:0px; width:0px; height: 0px;}
+    100% {left:335px; width:80px; height: 80px;}
+}
+
+@keyframes scrollButtonRetry {
+    0% {left:0px; width:0px; height: 0px;}
+    100% {left:435px; width:80px; height: 80px;}
+}
+
+@keyframes scrollTitle {
+    0%{font-size: 0px;}
+    100%{font-size: 50px;}
 }
