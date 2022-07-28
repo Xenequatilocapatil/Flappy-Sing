@@ -53,10 +53,11 @@
 }
 
 #score_2{
-    color: rgb(24, 5, 5);
+    color: rgb(216, 158, 50);
+    text-shadow: black 0 0 20px;
+    text-decoration: solid;
     margin: 30px auto;
     text-align: center;
-    text-shadow: black 0 0 20px;
     font-size: 50px;
     font-weight: bold;
 }

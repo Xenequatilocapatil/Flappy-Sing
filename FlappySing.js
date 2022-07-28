@@ -64,7 +64,9 @@ let halo = [2, 9, 11, 12, 11, 14, 12, 11, 9, "*", 16, 17, 19, "*", 17, 14, 17, 1
 
 //Game mode
 let choosenSong = fraMartino; 
-let mode = false;// if true => random mode, if false => songs
+let mode = false; // if true => random mode, if false => songs
+let songTitle = null; // will be the text to print in the game over menù
+let difficulty = null; // will be the text to print in the game over menù
 
 
 //Elements gets
@@ -406,7 +408,12 @@ function starting() {
 				if((charY < ObstacleBTop) || (charY > canvasHeight-charHeight - ObstacleTBottom)){
 					gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2);
 					temp_score = score;
-					scoreElem_2.innerHTML = `score: ${temp_score}`;
+					if (mode){
+						scoreElem_2.innerHTML = "Score in " + difficulty + " : " + temp_score;
+					}
+					else {
+						scoreElem_2.innerHTML = "Score in " + songTitle +" : " + temp_score;
+					}					
 					score = 0;
 					scoreElem.innerHTML = `score: ${score}`;
 				}
@@ -415,7 +422,13 @@ function starting() {
 				if((charY < ObstacleB2Top) || (charY > canvasHeight-charHeight - ObstacleT2Bottom)){
 					gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2);
 					temp_score = score;
-					scoreElem_2.innerHTML = `score: ${temp_score}`;
+					if (mode){
+						scoreElem_2.innerHTML = "Score in " + difficulty + " : " + temp_score;
+					}
+					else {
+						scoreElem_2.innerHTML = "Score in " + songTitle +" : " + temp_score;
+					}
+					// scoreElem_2.innerHTML = `Your score is: ${temp_score}`;
 					score = 0;
 					scoreElem.innerHTML = `score: ${score}`;
 				}
@@ -645,6 +658,7 @@ function selectDifficulty(diff){
 			errorMargin = 30;
 			maxInterval = 7;
 			intervalsVector = [0,1,2,3,4,5,7,12,-1,-2,-3,-4,-5,-7,-12];
+			difficulty = "Easy mode";
 			break;
 		case 2: //NORMAL
 			ObVel = 4;
@@ -652,24 +666,28 @@ function selectDifficulty(diff){
 			errorMargin = 22;
 			maxInterval = 12;
 			intervalsVector = [0,1,2,3,4,5,7,9,11,12,-1,-2,-3,-4,-5,-7,-9,-11,-12];
+			difficulty = "Normal mode";
 			break;
 		case 3: //HARD
 			ObVel = 3;
 			charToTargetVelocity = 0.2;
 			errorMargin = 16;
 			intervalsVector = [0,1,2,3,4,5,6,7,8,9,10,11,12,-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12];
+			difficulty = "Hard mode";
 			break;
 		case 4: //SPEEDFREAK
 			ObVel = 1.5;
 			charToTargetVelocity = 0.1;
 			errorMargin = 16;
 			intervalsVector = [0,1,2,3,4,5,6,7,8,9,10,11,12,-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12];
+			difficulty = "Speedfreak mode";
 			break;
 		case 5: //PERFECTPITCH
 			ObVel = 4;
 			charToTargetVelocity = 0.25;
 			errorMargin = 3;
 			intervalsVector = [0,1,2,3,4,5,6,7,8,9,10,11,12,-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12];
+			difficulty = "Perfectpitch mode";
 			break;
 		default:
 			ObVel = 4;
@@ -684,12 +702,15 @@ function selectSong(song_number){
 	switch (song_number){
 		case 1 :
 			choosenSong = fraMartino;
+			songTitle = "Fra Martino";
 			break;
 		case 2 :
 			choosenSong = perElisa;
+			songTitle = "Per Elisa";
 			break;
 		case 3 :
 			choosenSong = halo;
+			songTitle = "Halo";
 			break;
 		default:
 			choosenSong = fraMartino;
