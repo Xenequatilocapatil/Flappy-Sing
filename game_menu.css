@@ -95,6 +95,17 @@
     cursor: pointer;
 }
 
+#plant{
+    background-image: url(carnivorous_plant.png);
+    background-size: 100% 100%;
+    width: 330px;
+    height: 450px;
+    position: absolute;
+    top: -109px;
+    left: 1300px;
+    cursor: pointer;
+}
+
 #option{
     background-image: url(option.png);
     background-size: 100% 100%;
@@ -108,20 +119,35 @@
 
 @keyframes scrolling {
     0% {width:0px;}
+    25% {width:0px;}
+    75% {width:850px;}
     100% {width:850px;}
 }
 
 @keyframes scrollButtonHome {
     0% {left:0px; width:0px; height: 0px;}
+    25% {left:0px; width:0px; height: 0px;}
+    75% {left:335px; width:80px; height: 80px;}
     100% {left:335px; width:80px; height: 80px;}
 }
 
 @keyframes scrollButtonRetry {
     0% {left:0px; width:0px; height: 0px;}
+    25% {left:0px; width:0px; height: 0px;}
+    75% {left:435px; width:80px; height: 80px;}
     100% {left:435px; width:80px; height: 80px;}
 }
 
 @keyframes scrollTitle {
     0%{font-size: 0px;}
+    25%{font-size: 0px;}
+    75%{font-size: 50px;}
     100%{font-size: 50px;}
+}
+
+@keyframes animPlant {
+    0%{left:-330px;}
+    25%{left:-20px;}
+    75%{left:830px;}
+    100%{left: 1300px;}
 }

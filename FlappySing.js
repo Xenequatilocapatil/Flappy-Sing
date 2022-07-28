@@ -32,6 +32,7 @@ let oldNote = 14;
 let gameover = null;
 let home = null;
 let retry = null;
+let plant = null;
 
 //Pitch guiding
 let pitchGuiding = false; //activation flag
@@ -84,6 +85,7 @@ scoreElem_2 = document.getElementById("score_2");
 gameover = document.getElementById("gameover");
 home = document.getElementById("home");
 retry = document.getElementById("retry");
+plant = document.getElementById("plant");
 
 //Autocorrelation algorithm
 function autoCorrelate(buf, sampleRate) {
@@ -600,8 +602,6 @@ function toOptionsMenu(){
 }
 
 function toGameOverMenu(){
-	gameover.style.animation = 'none';
-	// scoreElem_2.style.animation = 'none';
 	toggleScreen('start-screen',false);
 	toggleScreen('gameover',true);
 	toggleScreen('game',true);
@@ -610,10 +610,11 @@ function toGameOverMenu(){
 	toggleScreen('mode-screen',false);
 	toggleScreen('song-screen',false);
 	toggleScreen('diff-screen',false);
-	gameover.style.animation = 'scrolling 1s linear';
-	home.style.animation = 'scrollButtonHome 1s linear';
-	retry.style.animation = 'scrollButtonRetry 1s linear';
-	scoreElem_2.style.animation = 'scrollTitle 1s linear';
+	gameover.style.animation = 'scrolling 1.5s linear';
+	home.style.animation = 'scrollButtonHome 1.5s linear';
+	retry.style.animation = 'scrollButtonRetry 1.5s linear';
+	scoreElem_2.style.animation = 'scrollTitle 1.5s linear';
+	plant.style.animation = 'animPlant 1.5s linear';
 }
 
 function toModeMenu(){
