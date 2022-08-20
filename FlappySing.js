@@ -2,7 +2,7 @@
 //import { autoCorrelate } from "./AutoCorrelate";
 
 let audioContext = null; //will be created on page load
-//Filter section: 90 - 1k bandpass
+//Filter section: 9s - 1k bandpass
 let filterNode1 = null; //created on page load
 let filterNode2 = null; //created on page load
 let analyser = null; //for pitch detection
@@ -45,7 +45,8 @@ let charFallVelocity = 4;
 let charToTargetVelocity = 0.3;
 let ObVel = 4; //Obstacle velocity in random mode
 let canvasHeight = 572;
-let charHeight = 60;
+let charHeight = 110;
+let charWidth = 110;
 let PxSemitone = 16; //pixxel a semitono
 let errorMargin = 20; //pixxel che separano il personaggio dagli ostacoli supponendo una perfetta intonazione
 let lowerNoteLimit = 5; //G2 = 0; default to B2 = 4
@@ -241,6 +242,19 @@ function GenerationHoleRandom(ObB, ObT, targetNote){
 
 	ObB.style.height = randomNote * PxSemitone - errorMargin + "px";
 	ObT.style.height = canvasHeight - randomNote * PxSemitone - charHeight - errorMargin + "px";
+	ObB.style.width = Math.max((randomNote * PxSemitone - errorMargin)/1.7, 80) + "px";
+	ObT.style.width = Math.max((canvasHeight - randomNote * PxSemitone - charHeight - errorMargin)/1.7, 80) + "px";
+	ObB.style.marginLeft = - Math.max((randomNote * PxSemitone - errorMargin)/1.7, 80)/2 + "px";
+	ObT.style.marginLeft = - Math.max((canvasHeight - randomNote * PxSemitone - charHeight - errorMargin)/1.7, 80)/2 + "px";
+
+	if(Math.random() > 0.5){
+		ObB.style.backgroundImage = "url('ObsB1.png')";
+		ObT.style.backgroundImage = "url('ObsT1.png')";
+	}else{
+		ObB.style.backgroundImage = "url('ObsB2.png')";
+		ObT.style.backgroundImage = "url('ObsT2.png')";
+	}
+
 	oldNote = randomNote;
 	targetNote.innerHTML = noteString2[randomNote%12];
 	targetNote.style.animation = 'none';
@@ -286,6 +300,7 @@ function GenerationHoleSeries(ObB, ObT, song, targetNote){
 	return seriesPitch;
 
 }
+
 
 function GenerationObstacle(song, mode){
 	if (mode){
@@ -365,14 +380,14 @@ function starting() {
 	});*/
 
 	var refreshIntervalID = setInterval(function(){ 
-		let ObstacleTLeft = parseInt(window.getComputedStyle(ObTElem).getPropertyValue("left"))+15;
-		let ObstacleBLeft = parseInt(window.getComputedStyle(ObBElem).getPropertyValue("left"))+15;
-		let ObstacleTBottom = parseInt(window.getComputedStyle(ObTElem).getPropertyValue("height"))-10;
-		let ObstacleBTop = parseInt(window.getComputedStyle(ObBElem).getPropertyValue("height"))-10;
-		let ObstacleT2Left = parseInt(window.getComputedStyle(ObT2Elem).getPropertyValue("left"))+15;
-		let ObstacleB2Left = parseInt(window.getComputedStyle(ObB2Elem).getPropertyValue("left"))+15;
-		let ObstacleT2Bottom = parseInt(window.getComputedStyle(ObT2Elem).getPropertyValue("height"))-10;
-		let ObstacleB2Top = parseInt(window.getComputedStyle(ObB2Elem).getPropertyValue("height"))-10;
+		let ObstacleTLeft = parseInt(window.getComputedStyle(ObTElem).getPropertyValue("left"));
+		let ObstacleBLeft = parseInt(window.getComputedStyle(ObBElem).getPropertyValue("left"));
+		let ObstacleTBottom = parseInt(window.getComputedStyle(ObTElem).getPropertyValue("height"))-15;
+		let ObstacleBTop = parseInt(window.getComputedStyle(ObBElem).getPropertyValue("height"))-15;
+		let ObstacleT2Left = parseInt(window.getComputedStyle(ObT2Elem).getPropertyValue("left"));
+		let ObstacleB2Left = parseInt(window.getComputedStyle(ObB2Elem).getPropertyValue("left"));
+		let ObstacleT2Bottom = parseInt(window.getComputedStyle(ObT2Elem).getPropertyValue("height"))-15;
+		let ObstacleB2Top = parseInt(window.getComputedStyle(ObB2Elem).getPropertyValue("height"))-15;
 		let charY = parseInt(window.getComputedStyle(charElem).getPropertyValue("bottom"));
 	
 		if(((ObstacleTLeft < 100) && (ObstacleTLeft > 50)) || ((ObstacleT2Left < 100) && (ObstacleT2Left > 50))){// score incrementation
@@ -396,8 +411,8 @@ function starting() {
 
 		//COLLISION DETECTION:
 		if(collisionDetection){
-			if(((ObstacleTLeft && ObstacleBLeft) < 100) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {
-				if((charY < ObstacleBTop) || (charY > canvasHeight-charHeight - ObstacleTBottom)){
+			if(((ObstacleTLeft && ObstacleBLeft) < 50 + charWidth) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {
+				if((charY < ObstacleBTop) || (charY > canvasHeight - charHeight - ObstacleTBottom)){
 					gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2);
 					temp_score = score;
 					scoreElem_2.innerHTML = `score: ${temp_score}`;
@@ -405,7 +420,7 @@ function starting() {
 					scoreElem.innerHTML = `score: ${score}`;
 				}
 			}
-			if(((ObstacleT2Left && ObstacleB2Left) < 100) && ((ObstacleT2Left && ObstacleB2Left) > 50)) {
+			if(((ObstacleT2Left && ObstacleB2Left) < 50 + charWidth) && ((ObstacleT2Left && ObstacleB2Left) > 50)) {
 				if((charY < ObstacleB2Top) || (charY > canvasHeight-charHeight - ObstacleT2Bottom)){
 					gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2);
 					temp_score = score;

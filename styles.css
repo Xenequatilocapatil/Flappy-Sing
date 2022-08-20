@@ -1,5 +1,5 @@
 body {
-  background-color: rgb(127, 219, 255);
+  background-color: rgb(4, 169, 187);
 }
 
 /*.screen{
@@ -37,7 +37,7 @@ body {
 }
 
 #game {
-  background-image: url(body.png);
+  background-image: url(Background.png);
   background-size: 100% 100%;
   bottom: 50px;
   left: 300px;
@@ -50,17 +50,13 @@ body {
 
 }
 
-#gameover {
-  background-color: rgb(0, 0, 0, 0.3);
+#grass {
+  background-image: url(Background_plants.png);
   background-size: 100% 100%;
-  bottom: 200px;
+  bottom: 50px;
   left: 300px;
   width: 850px;
-  height: 272px;
-  border: 4px solid black;
-  margin: auto;
-  position: fixed; /*changed from relative to fixed */
-
+  height: 572px;
 }
 
 #targetNote, #targetNote2 {
@@ -71,9 +67,9 @@ body {
 }
 
 #character {
-  width: 50px;
-  height: 60px;
-  background-image: url(Character.png);
+  width: 110px;
+  height: 110px;
+  background-image: url(Cicada.png);
   background-size: 100% 100%;
   position: absolute;
   bottom: 256px;
@@ -81,18 +77,18 @@ body {
 }
 
 #obstacleT, #obstacleT2 {
-  width: 50px;
+  width: 150px;
   height: 240px;
-  background-image: url(spikeT.png);
+  background-image: url(ObsT1.png);
   background-size: 100% 100%;
   position: absolute;
   left: 850px;
 }
 
 #obstacleB, #obstacleB2 {
-  width: 50px;
+  width: 150px;
   height: 240px;
-  background-image: url(spikeB.png);
+  background-image: url(ObsB1.png);
   background-size: 100% 100%;
   position: absolute;
   left: 850px;
@@ -101,6 +97,6 @@ body {
 
 
 @keyframes obstacle {
-  0%{left:850px}
-  100%{left:-50px}
+  0%{left:900px}
+  100%{left:-200px}
 }
