@@ -585,6 +585,7 @@ function toggleScreen(id,toggle){
 
 function toStartingScreen(){
 	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',false);
 	toggleScreen('gameover',false);
 	toggleScreen('game',true);
 	toggleScreen('indicators', true);
@@ -596,6 +597,7 @@ function toStartingScreen(){
 
 function toMainMenu(){
 	toggleScreen('start-screen',true);
+	toggleScreen('gameover-screen',false);
 	toggleScreen('gameover',false);
 	toggleScreen('game',false);
 	toggleScreen('indicators', false);
@@ -607,6 +609,7 @@ function toMainMenu(){
 
 function toOptionsMenu(){
 	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',false);
 	toggleScreen('gameover',false);
 	toggleScreen('game',false);
 	toggleScreen('indicators', false);
@@ -630,10 +633,11 @@ function toGameOverMenu(){
 	retry.style.animation = 'scrollButtonRetry 1.5s linear';
 	scoreElem_2.style.animation = 'scrollTitle 1.5s linear';
 	plant.style.animation = 'animPlant 1.5s linear';
-}
+  }
 
 function toModeMenu(){
 	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',false);
 	toggleScreen('gameover',false);
 	toggleScreen('game',false);
 	toggleScreen('indicators', false);
@@ -644,6 +648,7 @@ function toModeMenu(){
 }
 function toDiffMenu(){
 	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',false);
 	toggleScreen('gameover',false);
 	toggleScreen('game',false);
 	toggleScreen('indicators', false);
@@ -655,6 +660,7 @@ function toDiffMenu(){
 
 function toSongMenu(){
 	toggleScreen('start-screen',false);
+	toggleScreen('gameover-screen',false);
 	toggleScreen('gameover',false);
 	toggleScreen('game',false);
 	toggleScreen('indicators', false);
