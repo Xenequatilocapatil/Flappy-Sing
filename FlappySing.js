@@ -205,10 +205,10 @@ function gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2){
 	clearInterval(intervalOb2); //Stop Ob2 generation
 
 	//Obstacle style manual reset
-	ObTElem.style.left = 850 + "px";
-	ObBElem.style.left = 850 + "px";
-	ObT2Elem.style.left = 850 + "px";
-	ObB2Elem.style.left = 850 + "px";
+	ObTElem.style.left = 950 + "px";
+	ObBElem.style.left = 950 + "px";
+	ObT2Elem.style.left = 950 + "px";
+	ObB2Elem.style.left = 950 + "px";
 
 	ObTElem.style.animation = 'none';
 	ObBElem.style.animation = 'none'
@@ -270,7 +270,7 @@ function GenerationHoleRandom(ObB, ObT, targetNote){
 	targetNote.style.animation = 'none';
 	targetNote.offsetHeight;
 	targetNote.style.animation = 'obstacle ' + ObVel + 's linear';
-	targetNote.style.bottom = randomNote * PxSemitone  + "px";
+	targetNote.style.bottom = randomNote * PxSemitone  + charHeight/2 - 30 +  "px";
 
 	let randomPitch = 98*Math.pow(2,randomNote/12);
 
@@ -295,6 +295,18 @@ function GenerationHoleSeries(ObB, ObT, song, targetNote){
 		targetNote.offsetHeight;
 		targetNote.style.animation = 'obstacle ' + ObVel + 's linear';
 		targetNote.style.bottom = song[series] * PxSemitone  + "px";
+		/*ObB.style.width = Math.max((randomNote * PxSemitone - errorMargin)/1.7, 80) + "px";
+		ObT.style.width = Math.max((canvasHeight - randomNote * PxSemitone - charHeight - errorMargin)/1.7, 80) + "px";
+		ObB.style.marginLeft = - Math.max((randomNote * PxSemitone - errorMargin)/1.7, 80)/2 + "px";
+		ObT.style.marginLeft = - Math.max((canvasHeight - randomNote * PxSemitone - charHeight - errorMargin)/1.7, 80)/2 + "px";
+	
+		if(Math.random() > 0.5){
+			ObB.style.backgroundImage = "url('ObsB1.png')";
+			ObT.style.backgroundImage = "url('ObsT1.png')";
+		}else{
+			ObB.style.backgroundImage = "url('ObsB2.png')";
+			ObT.style.backgroundImage = "url('ObsT2.png')";
+		}*/
 	}
 	series++;
 	if(series == song.length){
@@ -492,7 +504,7 @@ function updatePitch() {//it also update the character y position
 		
 		if (allowMovement > 2){
 			charElem.style.transition = "bottom " + charToTargetVelocity + "s linear"; 
-			charElem.style.bottom =  buff1/buff2 * (canvasHeight-charHeight) + "px";
+			charElem.style.bottom =  buff1/buff2 * (canvasHeight-charHeight) + 25 + "px";
 			noteElem.innerHTML = noteStrings[note%12];
 			allowMovement = 0;
 			
