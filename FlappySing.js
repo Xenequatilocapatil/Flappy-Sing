@@ -290,15 +290,10 @@ function GenerationHoleSeries(ObB, ObT, song, targetNote){
 		ObB.style.animation = 'obstacle ' + ObVel + 's linear';
 		ObB.style.height = song[series]*PxSemitone - errorMargin + "px";
 		ObT.style.height = canvasHeight - song[series]*PxSemitone - charHeight - errorMargin + "px";
-		targetNote.innerHTML = noteString2[song[series]%12];
-		targetNote.style.animation = 'none';
-		targetNote.offsetHeight;
-		targetNote.style.animation = 'obstacle ' + ObVel + 's linear';
-		targetNote.style.bottom = song[series] * PxSemitone  + "px";
-		/*ObB.style.width = Math.max((randomNote * PxSemitone - errorMargin)/1.7, 80) + "px";
-		ObT.style.width = Math.max((canvasHeight - randomNote * PxSemitone - charHeight - errorMargin)/1.7, 80) + "px";
-		ObB.style.marginLeft = - Math.max((randomNote * PxSemitone - errorMargin)/1.7, 80)/2 + "px";
-		ObT.style.marginLeft = - Math.max((canvasHeight - randomNote * PxSemitone - charHeight - errorMargin)/1.7, 80)/2 + "px";
+		ObB.style.width = Math.max((song[series] * PxSemitone - errorMargin)/1.7, 80) + "px";
+		ObT.style.width = Math.max((canvasHeight - song[series] * PxSemitone - charHeight - errorMargin)/1.7, 80) + "px";
+		ObB.style.marginLeft = - Math.max((song[series] * PxSemitone - errorMargin)/1.7, 80)/2 + "px";
+		ObT.style.marginLeft = - Math.max((canvasHeight - song[series] * PxSemitone - charHeight - errorMargin)/1.7, 80)/2 + "px";
 	
 		if(Math.random() > 0.5){
 			ObB.style.backgroundImage = "url('ObsB1.png')";
@@ -306,7 +301,12 @@ function GenerationHoleSeries(ObB, ObT, song, targetNote){
 		}else{
 			ObB.style.backgroundImage = "url('ObsB2.png')";
 			ObT.style.backgroundImage = "url('ObsT2.png')";
-		}*/
+		}
+		targetNote.innerHTML = noteString2[song[series]%12];
+		targetNote.style.animation = 'none';
+		targetNote.offsetHeight;
+		targetNote.style.animation = 'obstacle ' + ObVel + 's linear';
+		targetNote.style.bottom = song[series] * PxSemitone + charHeight/2 - 30  + "px";
 	}
 	series++;
 	if(series == song.length){
