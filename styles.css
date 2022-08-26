@@ -26,6 +26,7 @@ body {
   font-size: 100px;
   position: absolute; 
   right: 0px; 
+  
 }
 
 #game {
@@ -67,7 +68,10 @@ body {
   color: rgb(0, 0, 0);
   display: inline-block;
   font-size: 50px;
-  position: absolute;  
+  position: absolute;
+  font-family: "Lucida Console", "Courier New", monospace;
+  color:rgb(43, 59, 76);
+  font-weight: 500;
 }
 
 #character {

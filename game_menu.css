@@ -16,33 +16,20 @@
     text-align: center;
     line-height: 100px;
     transition-duration: 0.4s;
-    /*list-style: none;
-    width: 250px;
-    height: 48px;
-    line-height: 48px;
-    text-align: center;
-    position: relative; 
-    left: calc(50% - 125px);
-    border: 1px solid red;
-    background-color: rgb(255, 255, 255);
-    font-size: 30px;
-    text-shadow: black 2px 2px 2px;
-    cursor: pointer;
-
-    box-shadow: inset 0 0 20px forestgreen;
-    outline: 2px solid;
-    outline-color: blue;
-
-    top: 20px;
-    margin-top: 10px;
-    margin-bottom: 10px;*/
+    font-family: "Lucida Console", "Courier New", monospace;
+    color:rgb(43, 59, 76);
+    font-size: 3rem;
+    font-weight: 500;
+    
 }
 
-button:hover{
-    box-shadow: inset 0 0 10px red ;
-    outline-color: black;
-    outline-offset: 2.5px;
-    text-shadow: green 1px 1px 2px;
+.button:hover{
+    width: 320px;
+    left: calc(50% - 160px);
+    height: 90px;
+    top: 85px;
+    text-shadow: 4px 4px 5px rgb(56, 61, 20);
+    
 }
 
 .button--first{
@@ -76,6 +63,11 @@ button:hover{
     top: 20px;
     left: 10px;
     cursor: pointer;
+    transition-duration: 0.4s;
+}
+#back:hover{
+    width: 90px;
+    height: 70px;
 }
 
 #home{
@@ -87,17 +79,47 @@ button:hover{
     top: 130px;
     left: 335px;
     cursor: pointer;
+    transition-duration: 0.4s;
+}
+#home:hover{
+    width: 90px;
+    height: 90px;
+    top: 125px;
+    left: 330px;
 }
 
 #retry{
     background-image: url(retry_button.png);
     background-size: 100% 100%;
-    width: 80px;
-    height: 80px;
+    width: 73px;
+    height: 73px;
     position: absolute;
-    top: 130px;
+    top: 137px;
     left: 435px;
     cursor: pointer;
+    transition-duration: 0.4s;
+}
+#retry:hover{
+    width: 80px;
+    height: 80px;
+    top: 134px;
+    left: 432px;
+}
+
+#option{
+    background-image: url(option.png);
+    background-size: 100% 100%;
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    cursor: pointer;
+    transition-duration: 0.4s;
+}
+#option:hover{
+    width: 60px;
+    height: 60px;
 }
 
 #plant{
@@ -111,16 +133,6 @@ button:hover{
     cursor: pointer;
 }
 
-#option{
-    background-image: url(option.png);
-    background-size: 100% 100%;
-    width: 50px;
-    height: 50px;
-    position: absolute;
-    top: 20px;
-    right: 25px;
-    cursor: pointer;
-}
 
 @keyframes scrolling {
     0% {width:0px;}
@@ -139,8 +151,8 @@ button:hover{
 @keyframes scrollButtonRetry {
     0% {left:0px; width:0px; height: 0px;}
     25% {left:0px; width:0px; height: 0px;}
-    75% {left:435px; width:80px; height: 80px;}
-    100% {left:435px; width:80px; height: 80px;}
+    75% {left:435px; width:73px; height: 73px;}
+    100% {left:435px; width:73px; height: 73px;}
 }
 
 @keyframes scrollTitle {
