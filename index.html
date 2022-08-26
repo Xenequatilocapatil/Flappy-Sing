@@ -8,8 +8,8 @@
 		
 		<!-- MAIN MENU -->
 		<div id = "start-screen" class = "menu screen" style="display:block">
-			<img src="title.png" alt="title">
-			<ul>
+			<!--<img src="title.png" alt="title">-->
+			<a href="https://www.fontspace.com/category/swatches"><img src="https://see.fontimg.com/api/renderfont4/OYRo/eyJyIjoiZnMiLCJoIjozNjIsInciOjIwMDAsImZzIjoxODEsImZnYyI6IiM4OTAzMDMiLCJiZ2MiOiIjRkZGRkZGIiwidCI6MX0/RmxhcHB5IFNpbmc/wild-growth.png" alt="Swatches fonts"></a>
 				<li class = "button button--play" onclick="toModeMenu()">Play</li>
 				<div id = "option" onclick="toOptionsMenu()"></div>
 		</div>
@@ -18,8 +18,14 @@
 		<div id = "mode-screen" class = "menu screen" style="display:none">
 			<h1 class = "title">Choose Game Mode</h1>
 			<ul id = "mode_list">
-				<li class = "button button--easy" onclick="toSongMenu()">Song</li>
-				<li class = "button button--random" onclick="toDiffMenu()">Random</li>
+				<li 
+				class = "button button--easy" onclick="toSongMenu()">Song
+				
+				</li>
+				<li 
+				class = "button button--random" onclick="toDiffMenu()">
+				<img src="random.png" alt="random" width="210" height="40" >
+				</li>
 				<div id = "back" onclick="toMainMenu()"></div>
 		</div>
 
