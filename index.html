@@ -66,30 +66,7 @@
 
 		<!-- OPTIONS MENU -->
 		<div id = "options-screen" class="menu screen" style="display:none">
-			<label for="char_speed">Character Speed</label>
-			<input type="range"
-				id="char_speed"
-				min="0.5"
-				max="10"
-				value="4"
-				step="0.5"
-				aria-valuemin="1"
-				aria-valuemax="10"
-				aria-valuenow="4"
-			oninput="charSpeedUpdate(value)">
 
-			<label for="ob_speed">Obstacle Speed</label>
-			<input type="range"
-				id="ob_speed"
-				min="0.5"
-				max="10"
-				value="4"
-				step="0.5"
-				aria-valuemin="1"
-				aria-valuemax="10"
-				aria-valuenow="4"
-			oninput="obstacleSpeedUpdate(value)">
-			
 			<label for="pitch_guiding">Guide Pitch</label>
 			<input type = "checkbox"
 				id = "pitch_guiding"
@@ -101,6 +78,12 @@
 				id = "disable_collision"
 				name = "Disable Collision"
 			onchange="updateDisableCollision()">
+
+			<label for="disable_guided_start">Disable Guided Start</label>
+			<input type = "checkbox"
+				id = "disable_guided_start"
+				name = "Disable Guided Start"
+			onchange="updateDisableGuidedStart()">
 
 			<ul>
 				<div id = "back" onclick="toModeMenu()"></div>

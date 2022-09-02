@@ -93,10 +93,6 @@
     transition-duration: 0.4s;
     opacity: 0.8;
 }
-#back:hover{
-    width: 90px;
-    height: 70px;
-}
 
 #back:hover{
     width: 90px;
@@ -118,12 +114,6 @@
     transition-duration: 0.4s;
     opacity: 0.8;
 }
-#home:hover{
-    width: 90px;
-    height: 90px;
-    top: 125px;
-    left: 330px;
-}
 
 #home:hover{
     width: 100px;
@@ -136,26 +126,22 @@
 #retry{
     background-image: url(retry_button.png);
     background-size: 100% 100%;
-    width: 65px;
-    height: 65px;
+    width: 70px;
+    height: 70px;
     position: absolute;
-    top: 145px;
+    top: 141px;
     left: 435px;
     cursor: pointer;
     transition-duration: 0.4s;
-    opacity: 0.6;
-}
-#option:hover{
-    width: 60px;
-    height: 60px;
+    opacity: 0.8;
 }
 
 #retry:hover{
-    width: 85px;
-    height: 85px;
-    top: 125px;
-    left: 425px;
-    opacity: 0.9;
+    width: 80px;
+    height: 80px;
+    top: 134px;
+    left: 432px;
+    opacity: 1;
 }
 
 #song{
@@ -352,7 +338,6 @@
 /* --------------------IMMAGINI E TITOLI------------------------ */
 
 #score_2{
-    text-shadow: black 0 0 20px;
     text-decoration: solid;
     margin: 30px auto;
     text-align: center;
@@ -360,6 +345,7 @@
     font-weight: bold;
     font-family: "Lucida Console", "Courier New", monospace;
     color: rgb(216, 158, 50);
+    text-shadow: black 0 0 20px;
     font-weight: 500;
 }
 
@@ -466,8 +452,8 @@
 @keyframes scrollButtonRetry {
     0% {left:0px; width:0px; height: 0px;}
     25% {left:0px; width:0px; height: 0px;}
-    75% {left:435px; width: 65px; height: 65px;}
-    100% {left:435px; width: 65px; height: 65px;}
+    75% {left:435px; width: 70px; height: 70px;}
+    100% {left:435px; width: 70px; height: 70px;}
 }
 
 @keyframes scrollTitle {

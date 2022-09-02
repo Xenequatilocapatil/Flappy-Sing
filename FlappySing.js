@@ -41,6 +41,8 @@ let flappy_sing_title = null;
 let song_btn = null;
 let random_btn = null;
 let option_btn = null;
+let firstNote = null;
+let guidedStart = true;
 
 
 //Pitch guiding
@@ -274,13 +276,25 @@ function GenerationHoleRandom(ObB, ObT, targetNote){
 	ObB.style.marginLeft = - Math.max((randomNote * PxSemitone - errorMargin)/1.7, 80)/2 + "px";
 	ObT.style.marginLeft = - Math.max((canvasHeight - randomNote * PxSemitone - charHeight - errorMargin)/1.7, 80)/2 + "px";
 
-	if(Math.random() > 0.5){
+	if (randomNote > 23){
+		ObT.style.backgroundImage = "url('SmallPlant_Top.png')";
 		ObB.style.backgroundImage = "url('ObsB1.png')";
-		ObT.style.backgroundImage = "url('ObsT1.png')";
-	}else{
-		ObB.style.backgroundImage = "url('ObsB2.png')";
-		ObT.style.backgroundImage = "url('ObsT2.png')";
 	}
+	if(randomNote < 8){
+		ObT.style.backgroundImage = "url('ObsT2.png')";
+		ObB.style.backgroundImage = "url('SmallPlant_Bottom.png')";
+	}
+	if(randomNote < 23 && randomNote > 8){
+		if(Math.random() > 0.5){
+			ObB.style.backgroundImage = "url('ObsB1.png')";
+			ObT.style.backgroundImage = "url('ObsT1.png')";
+		}else{
+			ObB.style.backgroundImage = "url('ObsB2.png')";
+			ObT.style.backgroundImage = "url('ObsT2.png')";
+		}
+	}
+
+	
 
 	oldNote = randomNote;
 	targetNote.innerHTML = noteString2[randomNote%12];
@@ -312,12 +326,22 @@ function GenerationHoleSeries(ObB, ObT, song, targetNote){
 		ObB.style.marginLeft = - Math.max((song[series] * PxSemitone - errorMargin)/1.7, 80)/2 + "px";
 		ObT.style.marginLeft = - Math.max((canvasHeight - song[series] * PxSemitone - charHeight - errorMargin)/1.7, 80)/2 + "px";
 	
-		if(Math.random() > 0.5){
+		if (song[series] > 23){
+			ObT.style.backgroundImage = "url('SmallPlant_Top.png')";
 			ObB.style.backgroundImage = "url('ObsB1.png')";
-			ObT.style.backgroundImage = "url('ObsT1.png')";
-		}else{
-			ObB.style.backgroundImage = "url('ObsB2.png')";
+		}
+		if(song[series] < 8){
 			ObT.style.backgroundImage = "url('ObsT2.png')";
+			ObB.style.backgroundImage = "url('SmallPlant_Bottom.png')";
+		}
+		if(song[series] < 23 && song[series] > 8){
+			if(Math.random() > 0.5){
+				ObB.style.backgroundImage = "url('ObsB1.png')";
+				ObT.style.backgroundImage = "url('ObsT1.png')";
+			}else{
+				ObB.style.backgroundImage = "url('ObsB2.png')";
+				ObT.style.backgroundImage = "url('ObsT2.png')";
+			}
 		}
 		targetNote.innerHTML = noteString2[song[series]%12];
 		targetNote.style.animation = 'none';
@@ -344,16 +368,24 @@ function GenerationHoleSeries(ObB, ObT, song, targetNote){
 function GenerationObstacle(song, mode){
 	if (mode){
 		pitch1 = GenerationHoleRandom(ObBElem, ObTElem, targetNoteElem);
+		if(firstNote){
+			oscPlay(pitch1);
+			firstNote = false;
+		}
 	}else{
 		ObVel = song[0];
 		pitch1 = GenerationHoleSeries(ObBElem, ObTElem, song, targetNoteElem);
+		if(firstNote){
+			oscPlay(98*Math.pow(2,song[1]/12));
+			firstNote = false;
+		}
 	}
 
-	currentPitch[0] = currentPitch[1];
-	currentPitch[1] = pitch1;
+	//currentPitch[0] = currentPitch[1];
+	//currentPitch[1] = pitch1;
 
-	if(pitchGuiding && (currentPitch[0] != null))
-		oscPlay(currentPitch[0]);
+	//if(pitchGuiding && (currentPitch[0] != null))
+		//oscPlay(currentPitch[0]);
 
 
 }
@@ -361,16 +393,18 @@ function GenerationObstacle(song, mode){
 function GenerationObstacle2(song, mode){
 	if (mode){
 		pitch2 = GenerationHoleRandom(ObB2Elem, ObT2Elem, targetNote2Elem);
+		oscStop();
 	}else{
 		ObVel = song[0];
 		pitch2 = GenerationHoleSeries(ObB2Elem, ObT2Elem, song, targetNote2Elem);
+		oscStop();
 	}
 
-	currentPitch[0] = currentPitch[1];
-	currentPitch[1] = pitch2;
+	//currentPitch[0] = currentPitch[1];
+	//currentPitch[1] = pitch2;
 
-	if(pitchGuiding && (currentPitch[0] != null))
-		oscPlay(currentPitch[0]);
+	//if(pitchGuiding && (currentPitch[0] != null))
+		//oscPlay(currentPitch[0]);
 
 }
 
@@ -450,8 +484,8 @@ function starting() {
 
 		//COLLISION DETECTION:
 		if(collisionDetection){
-			if(((ObstacleTLeft && ObstacleBLeft) < 50 + charWidth) && ((ObstacleTLeft && ObstacleBLeft) > 50)) {
-				if((charY < ObstacleBTop) || (charY > canvasHeight - charHeight - ObstacleTBottom)){
+			if(((ObstacleTLeft && ObstacleBLeft) < 50 + charWidth) && ((ObstacleTLeft && ObstacleBLeft) > 100)) {
+				if((charY < ObstacleBTop - 15) || (charY > canvasHeight - charHeight - ObstacleTBottom + 15)){
 					gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2);
 					temp_score = score;
 					if (mode){
@@ -464,8 +498,8 @@ function starting() {
 					scoreElem.innerHTML = `score: ${score}`;
 				}
 			}
-			if(((ObstacleT2Left && ObstacleB2Left) < 50 + charWidth) && ((ObstacleT2Left && ObstacleB2Left) > 50)) {
-				if((charY < ObstacleB2Top) || (charY > canvasHeight-charHeight - ObstacleT2Bottom)){
+			if(((ObstacleT2Left && ObstacleB2Left) < 50 + charWidth) && ((ObstacleT2Left && ObstacleB2Left) > 100)) {
+				if((charY < ObstacleB2Top - 15) || (charY > canvasHeight-charHeight - ObstacleT2Bottom + 15)){
 					gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2);
 					temp_score = score;
 					if (mode){
@@ -625,6 +659,11 @@ function toStartingScreen(){
 	toggleScreen('song-screen',false);
 	toggleScreen('diff-screen',false);
 	toggleScreen('starting-screen',false);
+	if(guidedStart){
+		firstNote = true;
+	}else{
+		firstNote = false;
+	}
 }
 
 function toMainMenu(){
@@ -636,14 +675,14 @@ function toMainMenu(){
 	toggleScreen('song-screen',false);
 	toggleScreen('diff-screen',false);
 	toggleScreen('starting-screen',true);
-	cicada1.style.animation = 'anim_cic1 3s linear';
-	cicada2.style.animation = 'anim_cic2 3s linear';
-	cicada3.style.animation = 'anim_cic3 3s linear';
-	carnivorous.style.animation = 'anim_carnivorous 4s linear'
-	flappy_sing_title.style.animation = 'fade_in 4s linear';
-	song_btn.style.animation = 'fade_in 4s linear';
-	random_btn.style.animation = 'fade_in 4s linear';
-	option_btn.style.animation = 'fade_in 4s linear';
+	cicada1.style.animation = 'anim_cic1 2s linear';
+	cicada2.style.animation = 'anim_cic2 2s linear';
+	cicada3.style.animation = 'anim_cic3 2s linear';
+	carnivorous.style.animation = 'anim_carnivorous 3s linear'
+	flappy_sing_title.style.animation = 'fade_in 3s linear';
+	song_btn.style.animation = 'fade_in 3s linear';
+	random_btn.style.animation = 'fade_in 3s linear';
+	option_btn.style.animation = 'fade_in 3s linear';
 }
 
 function toOptionsMenu(){
@@ -671,6 +710,11 @@ function toGameOverMenu(){
 	retry.style.animation = 'scrollButtonRetry 1.5s linear';
 	scoreElem_2.style.animation = 'scrollTitle 1.5s linear';
 	plant.style.animation = 'animPlant 1.5s linear';
+	if(guidedStart){
+		firstNote = true;
+	}else{
+		firstNote = false;
+	}
   }
 
 function toModeMenu(){
@@ -841,6 +885,15 @@ function updateDisableCollision(){
 		collisionDetection = false;
 	}else{
 		collisionDetection = true;
+	}
+}
+
+function updateDisableGuidedStart(){
+	let checkbox = document.getElementById('disable_guided_start');
+	if (checkbox.checked){
+		guidedStart = false;
+	}else{
+		guidedStart = true;
 	}
 }
 

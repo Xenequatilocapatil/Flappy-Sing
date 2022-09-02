@@ -8,13 +8,22 @@ body {
   font-size: 120px; 
   display: inline-block;
   height:180px;
-  text-align: left
+  font-family: "Lucida Console", "Courier New", monospace;
+  text-align: left;
+  font-weight: 600;
+  color: rgb(216, 158, 50);
+  text-shadow: black 0 0 10px;
 }
 
 #freq {
   color: rgb(0, 0, 0);
   display: inline-block;
+  font-size: 30px;
   height:100px;
+  font-family: "Lucida Console", "Courier New", monospace;
+  font-weight: 600;
+  color: rgb(216, 158, 50);
+  text-shadow: black 0 0 10px;
   text-align: left
 }
 
@@ -24,8 +33,12 @@ body {
   display: inline-block;
   height:130px;
   font-size: 100px;
+  font-family: "Lucida Console", "Courier New", monospace;
   position: absolute; 
   right: 0px; 
+  font-weight: 600;
+  color: rgb(216, 158, 50);
+  text-shadow: black 0 0 10px;
   
 }
 
@@ -71,7 +84,7 @@ body {
   position: absolute;
   font-family: "Lucida Console", "Courier New", monospace;
   color:rgb(43, 59, 76);
-  font-weight: 500;
+  font-weight: 100;
 }
 
 #character {
@@ -90,7 +103,7 @@ body {
   background-image: url(ObsT1.png);
   background-size: 100% 100%;
   position: absolute;
-  left: 850px;
+  left: 950px;
 }
 
 #obstacleB, #obstacleB2 {
@@ -99,7 +112,7 @@ body {
   background-image: url(ObsB1.png);
   background-size: 100% 100%;
   position: absolute;
-  left: 850px;
+  left: 950px;
   bottom: 0px;
 }
 
