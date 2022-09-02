@@ -33,6 +33,15 @@ let gameover = null;
 let home = null;
 let retry = null;
 let plant = null;
+let cicada1 = null;
+let cicada2 = null;
+let cicada3 = null;
+let carnivorous = null;
+let flappy_sing_title = null;
+let song_btn = null;
+let random_btn = null;
+let option_btn = null;
+
 
 //Pitch guiding
 let pitchGuiding = false; //activation flag
@@ -60,7 +69,7 @@ let collisionDetection = true; //Disables collision flag (one time playing)
 let intervalsVector = [];
 
 //Songs library  // il primo elemento rappresenta la ObVel
-let fraMartino = [2, 5, 7, 9, 5, 5, 7, 9, 5, 9, 10, 12, "*", 9, 10, 12, "*"]; //"*" => pausa
+let fraMartino = [2, 5, 7, 9, 5, 5, 7, 9, 5, 9, 10, 12, "*", 9, 10, 12, "*", 12, 14, 12, 10, 9, 5, 12, 14, 12, 10, 9, 5, 7, 12, 5, "*", 7, 12, 5, "*"]; //"*" => pausa
 let perElisa = [1.5, 21, 20, 21, 20, 21, 16, 19, 17, 14, "*", 5, 9, 14, 16, "*", 9, 13, 16, 17, "*", 9];
 let halo = [2, 9, 11, 12, 11, 14, 12, 11, 9, "*", 16, 17, 19, "*", 17, 14, 17, 16, "*", "*", 4, 7, 9, 12, 14, 11, "*", 9, 12, 11, 9, 11, 7, "*", 9, "*"]
 
@@ -87,6 +96,14 @@ gameover = document.getElementById("gameover");
 home = document.getElementById("home");
 retry = document.getElementById("retry");
 plant = document.getElementById("plant");
+cicada1 = document.getElementById("cicada1");
+cicada2 = document.getElementById("cicada2");
+cicada3 = document.getElementById("cicada3");
+carnivorous = document.getElementById("carnivorous");
+flappy_sing_title = document.getElementById("flappy_sing_title");
+song_btn = document.getElementById("song");
+random_btn = document.getElementById("random");
+option_btn = document.getElementById("option");
 
 //Autocorrelation algorithm
 function autoCorrelate(buf, sampleRate) {
@@ -588,6 +605,10 @@ window.addEventListener("load", () => {
 	navigator.mediaDevices.getUserMedia({audio: true}).then(gotStream);
 });
 
+window.addEventListener("DOMContentLoaded", () => {
+	toMainMenu();
+});
+
 //Screen functions
 function toggleScreen(id,toggle){
 	let element = document.getElementById(id);
@@ -596,7 +617,6 @@ function toggleScreen(id,toggle){
 }
 
 function toStartingScreen(){
-	toggleScreen('start-screen',false);
 	toggleScreen('gameover',false);
 	toggleScreen('game',true);
 	toggleScreen('indicators', true);
@@ -604,10 +624,10 @@ function toStartingScreen(){
 	toggleScreen('mode-screen',false);
 	toggleScreen('song-screen',false);
 	toggleScreen('diff-screen',false);
+	toggleScreen('starting-screen',false);
 }
 
 function toMainMenu(){
-	toggleScreen('start-screen',true);
 	toggleScreen('gameover',false);
 	toggleScreen('game',false);
 	toggleScreen('indicators', false);
@@ -615,10 +635,18 @@ function toMainMenu(){
 	toggleScreen('mode-screen',false);
 	toggleScreen('song-screen',false);
 	toggleScreen('diff-screen',false);
+	toggleScreen('starting-screen',true);
+	cicada1.style.animation = 'anim_cic1 3s linear';
+	cicada2.style.animation = 'anim_cic2 3s linear';
+	cicada3.style.animation = 'anim_cic3 3s linear';
+	carnivorous.style.animation = 'anim_carnivorous 4s linear'
+	flappy_sing_title.style.animation = 'fade_in 4s linear';
+	song_btn.style.animation = 'fade_in 4s linear';
+	random_btn.style.animation = 'fade_in 4s linear';
+	option_btn.style.animation = 'fade_in 4s linear';
 }
 
 function toOptionsMenu(){
-	toggleScreen('start-screen',false);
 	toggleScreen('gameover',false);
 	toggleScreen('game',false);
 	toggleScreen('indicators', false);
@@ -626,10 +654,10 @@ function toOptionsMenu(){
 	toggleScreen('mode-screen',false);
 	toggleScreen('song-screen',false);
 	toggleScreen('diff-screen',false);
+	toggleScreen('starting-screen',false);
 }
 
 function toGameOverMenu(){
-	toggleScreen('start-screen',false);
 	toggleScreen('gameover',true);
 	toggleScreen('game',true);
 	toggleScreen('indicators', false);
@@ -637,6 +665,7 @@ function toGameOverMenu(){
 	toggleScreen('mode-screen',false);
 	toggleScreen('song-screen',false);
 	toggleScreen('diff-screen',false);
+	toggleScreen('starting-screen',false);
 	gameover.style.animation = 'scrolling 1.5s linear';
 	home.style.animation = 'scrollButtonHome 1.5s linear';
 	retry.style.animation = 'scrollButtonRetry 1.5s linear';
@@ -645,7 +674,6 @@ function toGameOverMenu(){
   }
 
 function toModeMenu(){
-	toggleScreen('start-screen',false);
 	toggleScreen('gameover',false);
 	toggleScreen('game',false);
 	toggleScreen('indicators', false);
@@ -653,9 +681,9 @@ function toModeMenu(){
 	toggleScreen('mode-screen',true);
 	toggleScreen('song-screen',false);
 	toggleScreen('diff-screen',false);
+	toggleScreen('starting-screen',false);
 }
 function toDiffMenu(){
-	toggleScreen('start-screen',false);
 	toggleScreen('gameover',false);
 	toggleScreen('game',false);
 	toggleScreen('indicators', false);
@@ -663,10 +691,10 @@ function toDiffMenu(){
 	toggleScreen('mode-screen',false);
 	toggleScreen('song-screen',false);
 	toggleScreen('diff-screen',true);
+	toggleScreen('starting-screen',false);
 }
 
 function toSongMenu(){
-	toggleScreen('start-screen',false);
 	toggleScreen('gameover',false);
 	toggleScreen('game',false);
 	toggleScreen('indicators', false);
@@ -674,6 +702,7 @@ function toSongMenu(){
 	toggleScreen('mode-screen',false);
 	toggleScreen('song-screen',true);
 	toggleScreen('diff-screen',false);
+	toggleScreen('starting-screen',false);
 }
 
 
