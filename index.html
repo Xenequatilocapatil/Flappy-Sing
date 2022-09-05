@@ -67,23 +67,26 @@
 		<!-- OPTIONS MENU -->
 		<div id = "options-screen" class="menu screen" style="display:none">
 
-			<label for="pitch_guiding">Guide Pitch</label>
+			<label class="pitch_guiding">Guide Pitch</label>
 			<input type = "checkbox"
 				id = "pitch_guiding"
 				name = "Guide Pitch"
 			onchange="updateGuidePitch()">
+			<span class="checkmark"></span>
 
-			<label for="disable_collision">Disable Collision</label>
+			<label class="disable_collision">Disable Collision</label>
 			<input type = "checkbox"
 				id = "disable_collision"
 				name = "Disable Collision"
 			onchange="updateDisableCollision()">
+			<span class="checkmark"></span>
 
-			<label for="disable_guided_start">Disable Guided Start</label>
+			<label class="disable_guided_start">Disable Guided Start</label>
 			<input type = "checkbox"
 				id = "disable_guided_start"
 				name = "Disable Guided Start"
 			onchange="updateDisableGuidedStart()">
+			<span class="checkmark"></span>
 
 			<ul>
 				<div id = "back" onclick="toModeMenu()"></div>
