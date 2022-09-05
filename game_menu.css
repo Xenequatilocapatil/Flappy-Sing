@@ -2,64 +2,6 @@
     color: rgb(43, 0, 0)
 }
 
-/* ----------------------------BOTTONI------------------------------- */
-
-/* .button{
-    background-image: url(button.png);
-    list-style-type: none; 
-    background-size: 100% 100%;
-    width: 300px;
-    height: 80px;
-    position: relative;
-    left: calc(50% - 150px);
-    cursor: pointer;
-    top: 90px;
-    text-align: center;
-    line-height: 100px;
-    transition-duration: 0.4s;
-    list-style: none;
-    width: 250px;
-    height: 48px;
-    line-height: 48px;
-    text-align: center;
-    position: relative; 
-    left: calc(50% - 125px);
-    border: 1px solid red;
-    background-color: rgb(255, 255, 255);
-    font-size: 30px;
-    text-shadow: black 2px 2px 2px;
-    cursor: pointer;
-
-    box-shadow: inset 0 0 20px forestgreen;
-    outline: 2px solid;
-    outline-color: blue;
-
-    top: 20px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-.button:hover{
-    width: 320px;
-    left: calc(50% - 160px);
-    height: 90px;
-    top: 85px;
-    text-shadow: 4px 4px 5px rgb(56, 61, 20);
-    
-}
-
-.button--first{
-    top: 150px;
-}
-
-.button--second{
-    top: 250px;
-}
-
-.button--third{
-    top: 350px;
-} */
-
 #option{
     background-image: url(option3.png);
     background-size: 100% 100%;
@@ -70,7 +12,6 @@
     right: 25px;
     cursor: pointer;
     transition-duration: 0.4s;
-    opacity: 0.8;
 }
 
 #option:hover{
@@ -78,7 +19,6 @@
     height: 90px;
     top: 10px;
     right: 15px;
-    opacity: 1;
 }
 
 #back{
@@ -91,7 +31,6 @@
     left: 25px;
     cursor: pointer;
     transition-duration: 0.4s;
-    opacity: 0.8;
 }
 
 #back:hover{
@@ -99,7 +38,6 @@
     height: 90px;
     top: 10px;
     left: 15px;
-    opacity: 1;
 }
 
 #home{
@@ -142,6 +80,25 @@
     top: 134px;
     left: 432px;
     opacity: 1;
+}
+
+#quit{
+    background-image: url(quit_button.png);
+    background-size: 100% 100%;
+    display: none;
+    position: absolute;
+    cursor: pointer;
+    width: 80px;
+    height: 60px;
+    bottom: 50px;
+    right: 23px;
+}
+
+#quit:hover{
+    width: 90px;
+    height: 68px;
+    bottom: 46px;
+    right: 18px;
 }
 
 #song{
@@ -334,6 +291,77 @@
     left: calc(50% - 215px);
 }
 
+/* --------------------CHECKMARKS PER OPTION MENU'------------------------ */
+
+/* Customize the label (the container) */
+.container {
+    display: block;
+    position: relative;
+    margin-top: 130px;
+    margin-left: 30%;
+    cursor: pointer;
+    font-size: 70px;
+    font-weight: bold;
+    font-family: "Lucida Console", "Courier New", monospace;
+    color: rgb(216, 158, 50);
+    text-shadow: black 0 0 20px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Hide the browser's default radio button */
+  .container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+  
+  /* Create a custom radio button */
+  .checkmark {
+    position: absolute;
+    top: -5px;
+    left: -100px;
+    height: 80px;
+    width: 80px;
+    background-color: #eee;
+    border-radius: 50%;
+  }
+  
+  /* On mouse-over, add a grey background color */
+  .container:hover input ~ .checkmark {
+    background-color: #ccc;
+  }
+  
+  /* When the radio button is checked, add a blue background */
+  .container input:checked ~ .checkmark {
+    background-color: rgb(216, 158, 50);
+  }
+  
+  /* Create the indicator (the dot/circle - hidden when not checked) */
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  
+  /* Show the indicator (dot/circle) when checked */
+  .container input:checked ~ .checkmark:after {
+    display: block;
+  }
+  
+  /* Style the indicator (dot/circle) */
+  .container .checkmark:after {
+    top: 30px;
+    left: 30px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: black;
+  }
 
 /* --------------------IMMAGINI E TITOLI------------------------ */
 

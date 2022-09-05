@@ -43,6 +43,10 @@ let random_btn = null;
 let option_btn = null;
 let firstNote = null;
 let guidedStart = true;
+let max_gain = 0.3;
+let checkbox_pitch_guiding = document.getElementById('pitch_guiding');
+let checkbox_disable_collision = document.getElementById('disable_collision');
+let checkbox_guided_start = document.getElementById('guided_start');
 
 
 //Pitch guiding
@@ -208,14 +212,15 @@ function autoCorrelate(buf, sampleRate) {
 function gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2){
 
 	//STOP OSCILLATORS!!
-	if(pitchGuiding){
+	/*if(pitchGuiding){
 		oscStop();
 		oscStorage.stop();
-	}
+	}*/
 
 	//Reset pitch storage
-	currentPitch[0] = null;
-	currentPitch[1] = null;
+	//currentPitch[0] = null;
+	//currentPitch[1] = null;
+	oscStop();
 
 	//Intervals stopping
 	clearTimeout(timeOutOb2); //Clear the timeout for the generation of obstacle 2 (if still running)
@@ -247,7 +252,7 @@ function gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2){
 	allowMovement = 0;
 	series = 1;
 	oldNote = 14;
-	scoreElem.innerHTML = `score: ${score}`;
+	scoreElem.innerHTML = `${score}`;
 	
 	//Screen toggling
 	toGameOverMenu();
@@ -452,29 +457,15 @@ function starting() {
 		let ObstacleT2Bottom = parseInt(window.getComputedStyle(ObT2Elem).getPropertyValue("height"))-15;
 		let ObstacleB2Top = parseInt(window.getComputedStyle(ObB2Elem).getPropertyValue("height"))-15;
 		let charY = parseInt(window.getComputedStyle(charElem).getPropertyValue("bottom"));
-	
-		/*if(ObstacleTLeft < 50 && ObstacleTLeft > 30){
-			oscPlay(pitch2);
-		}
-		if(ObstacleT2Left < 400 && ObstacleTLeft > 330){
-			oscStop();
-		}
-		if(ObstacleT2Left < 50 && ObstacleT2Left > 30){
-			oscPlay(pitch1);
-		}
-		if(ObstacleTLeft < 400 && ObstacleT2Left > 330){
-			oscStop();
-		}*/
 
-		if(((ObstacleTLeft < 100) && (ObstacleTLeft > 50)) || ((ObstacleT2Left < 100) && (ObstacleT2Left > 50))){// score incrementation
+		//if(((ObstacleTLeft < 100) && (ObstacleTLeft > 50)) || ((ObstacleT2Left < 100) && (ObstacleT2Left > 50))){// score incrementation
+		if(((ObstacleTLeft < 100) && (ObstacleTLeft > 50) && (charY > ObstacleBTop - 15) && (charY < canvasHeight - charHeight - ObstacleTBottom + 15)) || ((ObstacleT2Left < 100) && (ObstacleT2Left > 50) && (charY > ObstacleB2Top - 15) && (charY < canvasHeight - charHeight - ObstacleT2Bottom + 15))){
+			//if(((charY > ObstacleBTop - 15) && (charY < canvasHeight - charHeight - ObstacleTBottom + 15)) || ((charY > ObstacleB2Top - 15) && (charY < canvasHeight - charHeight - ObstacleT2Bottom + 15))){
 			insideObstacle = true;
-			//if(pitchGuiding){
-				//oscStop();
-			//}
 		}else{
-			if(insideObstacle == true){
+			if(insideObstacle){
 				score += 1;
-				scoreElem.innerHTML = `score: ${score}`;
+				scoreElem.innerHTML = `${score}`;
 				insideObstacle = false;
 			}
 		}
@@ -483,6 +474,7 @@ function starting() {
 		}else if(ObstacleT2Left < 110) {
 			targetNote2Elem.innerHTML = null;
 		}
+	
 		
 
 		//COLLISION DETECTION:
@@ -498,7 +490,7 @@ function starting() {
 						scoreElem_2.innerHTML = "Score in " + songTitle +" : " + temp_score;
 					}					
 					score = 0;
-					scoreElem.innerHTML = `score: ${score}`;
+					scoreElem.innerHTML = `${score}`;
 				}
 			}
 			if(((ObstacleT2Left && ObstacleB2Left) < 50 + charWidth) && ((ObstacleT2Left && ObstacleB2Left) > 100)) {
@@ -513,7 +505,7 @@ function starting() {
 					}
 					// scoreElem_2.innerHTML = `Your score is: ${temp_score}`;
 					score = 0;
-					scoreElem.innerHTML = `score: ${score}`;
+					scoreElem.innerHTML = `${score}`;
 				}
 			}
 		}
@@ -580,8 +572,7 @@ function oscPlay(pitch){
 	o.connect(gain);
 	const now = audioContext.currentTime;
 	gain.gain.setValueAtTime(0,now);
-	let max_gain = 0.3;
-	let attack = 0.2;
+	let attack = 0.5;
 
 	if(pitch < 200){
 		max_gain = 0.7;
@@ -606,9 +597,10 @@ function oscFreq(pitch){
 
 function oscStop(){
 	const now = audioContext.currentTime;
-	let decay = 0.1;
+	let decay = 0.5;
+	gainStorage.gain.setValueAtTime(max_gain, now);
 	gainStorage.gain.linearRampToValueAtTime(0, now + decay);
-	oscStorage.stop();
+	oscStorage.stop(now + decay);
 }
 
 
@@ -662,6 +654,11 @@ function toStartingScreen(){
 	toggleScreen('song-screen',false);
 	toggleScreen('diff-screen',false);
 	toggleScreen('starting-screen',false);
+
+	if(!collisionDetection){
+		toggleScreen('quit', true);
+	}
+
 	if(guidedStart){
 		firstNote = true;
 	}else{
@@ -678,6 +675,7 @@ function toMainMenu(){
 	toggleScreen('song-screen',false);
 	toggleScreen('diff-screen',false);
 	toggleScreen('starting-screen',true);
+	toggleScreen('quit', false);
 	cicada1.style.animation = 'anim_cic1 2s linear';
 	cicada2.style.animation = 'anim_cic2 2s linear';
 	cicada3.style.animation = 'anim_cic3 2s linear';
@@ -697,6 +695,7 @@ function toOptionsMenu(){
 	toggleScreen('song-screen',false);
 	toggleScreen('diff-screen',false);
 	toggleScreen('starting-screen',false);
+	toggleScreen('quit', false);
 }
 
 function toGameOverMenu(){
@@ -708,11 +707,13 @@ function toGameOverMenu(){
 	toggleScreen('song-screen',false);
 	toggleScreen('diff-screen',false);
 	toggleScreen('starting-screen',false);
+	toggleScreen('quit', false);
 	gameover.style.animation = 'scrolling 1.5s linear';
 	home.style.animation = 'scrollButtonHome 1.5s linear';
 	retry.style.animation = 'scrollButtonRetry 1.5s linear';
 	scoreElem_2.style.animation = 'scrollTitle 1.5s linear';
 	plant.style.animation = 'animPlant 1.5s linear';
+	//oscStop();
 	if(guidedStart){
 		firstNote = true;
 	}else{
@@ -729,6 +730,7 @@ function toModeMenu(){
 	toggleScreen('song-screen',false);
 	toggleScreen('diff-screen',false);
 	toggleScreen('starting-screen',false);
+	toggleScreen('quit', false);
 }
 function toDiffMenu(){
 	toggleScreen('gameover',false);
@@ -739,6 +741,7 @@ function toDiffMenu(){
 	toggleScreen('song-screen',false);
 	toggleScreen('diff-screen',true);
 	toggleScreen('starting-screen',false);
+	toggleScreen('quit', false);
 }
 
 function toSongMenu(){
@@ -750,6 +753,7 @@ function toSongMenu(){
 	toggleScreen('song-screen',true);
 	toggleScreen('diff-screen',false);
 	toggleScreen('starting-screen',false);
+	toggleScreen('quit', false);
 }
 
 
@@ -780,7 +784,7 @@ function selectDifficulty(diff){
 			difficulty = "Hard mode";
 			break;
 		case 4: //SPEEDFREAK
-			ObVel = 1.5;
+			ObVel = 2;
 			charToTargetVelocity = 0.1;
 			errorMargin = 16;
 			intervalsVector = [0,1,2,3,4,5,6,7,8,9,10,11,12,-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12];
@@ -789,7 +793,7 @@ function selectDifficulty(diff){
 		case 5: //PERFECTPITCH
 			ObVel = 4;
 			charToTargetVelocity = 0.25;
-			errorMargin = 3;
+			errorMargin = 4;
 			intervalsVector = [0,1,2,3,4,5,6,7,8,9,10,11,12,-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12];
 			difficulty = "Perfectpitch mode";
 			break;
@@ -874,29 +878,28 @@ function obstacleSpeedUpdate(value){
 }
 
 function updateGuidePitch(){
-	let checkbox = document.getElementById('pitch_guiding');
-	if (checkbox.checked){
-		pitchGuiding = true;
+	if (checkbox_pitch_guiding.checked){
+	  pitchGuiding = true;
+	  checkbox_guided_start.checked = false;
 	}else{
-		pitchGuiding = false;
+	  pitchGuiding = false;
 	}
-}
-
-function updateDisableCollision(){
-	let checkbox = document.getElementById('disable_collision');
-	if (checkbox.checked){
-		collisionDetection = false;
+  }
+  
+  function updateDisableCollision(){
+	if (checkbox_disable_collision.checked){
+	  collisionDetection = false;
 	}else{
-		collisionDetection = true;
+	  collisionDetection = true;
 	}
-}
-
-function updateDisableGuidedStart(){
-	let checkbox = document.getElementById('disable_guided_start');
-	if (checkbox.checked){
-		guidedStart = false;
+  }
+  
+  function updateGuidedStart(){
+	if (checkbox_guided_start.checked){
+	  checkbox_pitch_guiding.checked=false;
+	  guidedStart = true;
 	}else{
-		guidedStart = true;
+	  guidedStart = false;
 	}
-}
+  }
 

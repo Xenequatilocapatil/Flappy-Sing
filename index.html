@@ -68,23 +68,31 @@
 			<!-- OPTIONS MENU -->
 			<div id = "options-screen" class="menu screen" style="display:none">
 
-				<label for="pitch_guiding">Guide Pitch</label>
-				<input type = "checkbox"
-					id = "pitch_guiding"
-					name = "Guide Pitch"
-				onchange="updateGuidePitch()">
-
-				<label for="disable_collision">Disable Collision</label>
-				<input type = "checkbox"
-					id = "disable_collision"
-					name = "Disable Collision"
-				onchange="updateDisableCollision()">
-
-				<label for="disable_guided_start">Disable Guided Start</label>
-				<input type = "checkbox"
-					id = "disable_guided_start"
-					name = "Disable Guided Start"
-				onchange="updateDisableGuidedStart()">
+				
+				<label class="container" for="guided_start">Guided Start
+					<input type="checkbox"
+					  checked="true"
+					  name="Guided Start"
+					  id = "guided_start"
+					onchange="updateGuidedStart()">  
+					<span class="checkmark"></span>
+				  </label>
+		  
+				  <label class="container" for="pitch_guiding">Guided Pitch
+					<input type="checkbox" 
+					  name="Guide Pitch"
+					  id = "pitch_guiding"
+					onchange="updateGuidePitch()">  
+					<span class="checkmark"></span>
+				  </label>
+		  
+				  <label class="container" for="disable_collision">Disable Collision
+					<input type="checkbox" 
+					  name="Disable Collision"
+					  id = "disable_collision"
+					onchange="updateDisableCollision()">  
+					<span class="checkmark"></span>
+				  </label>
 
 				<ul>
 					<div id = "back" onclick="toModeMenu()"></div>
@@ -100,10 +108,11 @@
 
 			</div>
 			
+			<div id="quit" onclick="location.reload()"></div>
 			<div id = "indicators" style ="display:none">
 				<span id="note">--</span>
 				<span id="freq">--</span>
-				<span id="score">score: </span>
+				<span id="score">0</span>
 			</div>
 			
 			<!--GAME-->

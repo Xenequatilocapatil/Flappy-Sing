@@ -7,9 +7,7 @@ body {
 #background{
   background-image:url(bg3.jpg);
   position: absolute;
-  /* background-repeat: no-repeat;
-  background-attachment: fixed; */
-  width: 1500px;
+  width: 1430px;
   height: 690px;
   top: 50%;
   left: 50%;
@@ -42,13 +40,12 @@ body {
 
 
 #score {
-  color: rgb(0, 0, 0);
   display: inline-block;
-  height:130px;
-  font-size: 100px;
+  font-size: 230px;
   font-family: "Lucida Console", "Courier New", monospace;
   position: absolute; 
   right: 0px; 
+  top: 0px;
   font-weight: 600;
   color: rgb(216, 158, 50);
   text-shadow: black 0 0 10px;
