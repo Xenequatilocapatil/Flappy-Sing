@@ -61,7 +61,7 @@ body {
   height: 572px;
   border: 4px solid black;
   margin: auto;
-  position: absolute; /*changed from relative to fixed */
+  position: absolute;
   overflow: hidden;
 
 }
@@ -75,7 +75,7 @@ body {
   height: 272px;
   border: 4px solid black;
   margin: auto;
-  position: absolute; /*changed from relative to fixed */
+  position: absolute;
 }
 
 #grass {

@@ -12,7 +12,7 @@ let freqElem = null;
 let buflen = 2048;
 let buf = new Float32Array( buflen );
 let noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-let noteString2 = ["G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#"];//questa è una bella porcata
+let noteString2 = ["G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#"];
 let charElem = null;											//MIDI
 let ObTElem = null;			// G2:0, G#2:1, A2:2, A#2:3, B2:4, C3:5, C#3:6, D3:7, D#3:8, E3:9, F3:10, F#3:11, G3: 12
 let ObBElem = null;
@@ -44,18 +44,15 @@ let option_btn = null;
 let firstNote = null;
 let guidedStart = true;
 let max_gain = 0.3;
-let checkbox_pitch_guiding = document.getElementById('pitch_guiding');
-let checkbox_disable_collision = document.getElementById('disable_collision');
-let checkbox_guided_start = document.getElementById('guided_start');
+let checkbox_disable_collision = null;
+let checkbox_guided_start = null;
 
 
 //Pitch guiding
 let pitchGuiding = false; //activation flag
 let oscStorage = null; //global oscillator node variable
 let gainStorage = null; //global gain node variable
-let pitch1 = null; //pitch of obstacle 1
-let pitch2 = null; //pitch of obstacle 2
-let currentPitch = [null,null]; //pitch pipeline
+let pitch1 = null; 
 
 //PARAMETRI
 const maxFreq = 622.25;//D#5
@@ -71,7 +68,7 @@ let errorMargin = 20; //pixxel che separano il personaggio dagli ostacoli suppon
 let lowerNoteLimit = 5; //G2 = 0; default to B2 = 4
 let noteExtension = 22; //default to B2+24 = B4; Max possible note is G5
 let maxInterval = 12;
-let collisionDetection = true; //Disables collision flag (one time playing)
+let collisionDetection = true; //Disables collision flag
 let intervalsVector = [];
 
 //Songs library  // il primo elemento rappresenta la ObVel
@@ -110,55 +107,8 @@ flappy_sing_title = document.getElementById("flappy_sing_title");
 song_btn = document.getElementById("song");
 random_btn = document.getElementById("random");
 option_btn = document.getElementById("option");
-
-//Autocorrelation algorithm
-function autoCorrelate(buf, sampleRate) {
-	// Implements the ACF2+ algorithm
-	let SIZE = buf.length;
-	let rms = 0;
-
-	for (let i = 0; i < SIZE; i++) {
-		const val = buf[i];
-		rms += val * val;
-	}
-	rms = Math.sqrt(rms / SIZE);
-	if (rms < 0.01) // not enough signal
-		return -1;
-
-	var r1 = 0, r2 = SIZE - 1, thres = 0.2;
-	for (var i = 0; i < SIZE / 2; i++)
-		if (Math.abs(buf[i]) < thres) { r1 = i; break; }
-	for (var i = 1; i < SIZE / 2; i++)
-		if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
-
-	buf = buf.slice(r1, r2);
-	SIZE = buf.length;
-
-	let c = new Array(SIZE).fill(0);
-	for (var i = 0; i < SIZE; i++)
-		for (let j = 0; j < SIZE - i; j++)
-			c[i] = c[i] + buf[j] * buf[j + i];
-
-	let d = 0; while (c[d] > c[d + 1])
-		d++;
-	let maxval = -1, maxpos = -1;
-	for (let i = d; i < SIZE; i++) {
-		if (c[i] > maxval) {
-			maxval = c[i];
-			maxpos = i;
-		}
-	}
-	let T0 = maxpos;
-
-	let x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
-	let a = (x1 + x3 - 2 * x2) / 2;
-	let b = (x3 - x1) / 2;
-	if (a)
-		T0 = T0 - b / (2 * a);
-
-	return sampleRate / T0;
-}
-
+checkbox_disable_collision = document.getElementById('disable_collision');
+checkbox_guided_start = document.getElementById('guided_start');
 
 //Autocorrelation algorithm
 function autoCorrelate(buf, sampleRate) {
@@ -211,17 +161,7 @@ function autoCorrelate(buf, sampleRate) {
 
 function gameOverReset(refreshIntervalID,intervalOb1,intervalOb2,timeOutOb2){
 
-	//STOP OSCILLATORS!!
-	/*if(pitchGuiding){
-		oscStop();
-		oscStorage.stop();
-	}*/
-
-	//Reset pitch storage
-	//currentPitch[0] = null;
-	//currentPitch[1] = null;
 	oscStop();
-
 	//Intervals stopping
 	clearTimeout(timeOutOb2); //Clear the timeout for the generation of obstacle 2 (if still running)
 	clearInterval(refreshIntervalID); //Stop the refreshing
@@ -299,8 +239,6 @@ function GenerationHoleRandom(ObB, ObT, targetNote){
 		}
 	}
 
-	
-
 	oldNote = randomNote;
 	targetNote.innerHTML = noteString2[randomNote%12];
 	targetNote.style.animation = 'none';
@@ -313,7 +251,6 @@ function GenerationHoleRandom(ObB, ObT, targetNote){
 	return randomPitch;
 
 }
-
 
 
 function GenerationHoleSeries(ObB, ObT, song, targetNote){
@@ -385,30 +322,17 @@ function GenerationObstacle(song, mode){
 			firstNote = false;
 		}
 	}
-
-	//currentPitch[0] = currentPitch[1];
-	//currentPitch[1] = pitch1;
-
-	//if(pitchGuiding && (currentPitch[0] != null))
-		//oscPlay(currentPitch[0]);
 }
 
 function GenerationObstacle2(song, mode){
 	if (mode){
-		pitch2 = GenerationHoleRandom(ObB2Elem, ObT2Elem, targetNote2Elem);
+		GenerationHoleRandom(ObB2Elem, ObT2Elem, targetNote2Elem);
 		oscStop();
 	}else{
 		ObVel = song[0];
-		pitch2 = GenerationHoleSeries(ObB2Elem, ObT2Elem, song, targetNote2Elem);
+		GenerationHoleSeries(ObB2Elem, ObT2Elem, song, targetNote2Elem);
 		oscStop();
 	}
-	
-
-	//currentPitch[0] = currentPitch[1];
-	//currentPitch[1] = pitch2;
-
-	//if(pitchGuiding && (currentPitch[0] != null))
-		//oscPlay(currentPitch[0]);
 }
 
 
@@ -416,9 +340,7 @@ function GenerationObstacle2(song, mode){
 function starting() {
 
 	toStartingScreen();
-
 	series = 1;
-	
 	charElem.style.bottom = 256 + "px"; //Reposition character
 
 	GenerationObstacle(choosenSong, mode); //initial call
@@ -438,14 +360,6 @@ function starting() {
 		}, ObVel*1000);
 	}, ObVel/2 * 1000); 
 
-	/*
-	if(pitchGuiding){
-		currentPitch[0] = pitch1; //Force first
-		if(currentPitch[0] != null)
-			oscPlay(currentPitch[0]);
-	}*/
-	//START PLAYING CURRENT PITCH = PITCH1
-
 
 	var refreshIntervalID = setInterval(function(){ 
 		let ObstacleTLeft = parseInt(window.getComputedStyle(ObTElem).getPropertyValue("left"));
@@ -458,12 +372,10 @@ function starting() {
 		let ObstacleB2Top = parseInt(window.getComputedStyle(ObB2Elem).getPropertyValue("height"))-15;
 		let charY = parseInt(window.getComputedStyle(charElem).getPropertyValue("bottom"));
 
-		//if(((ObstacleTLeft < 100) && (ObstacleTLeft > 50)) || ((ObstacleT2Left < 100) && (ObstacleT2Left > 50))){// score incrementation
 		if(((ObstacleTLeft < 100) && (ObstacleTLeft > 50) && (charY > ObstacleBTop - 15) && (charY < canvasHeight - charHeight - ObstacleTBottom + 15)) || ((ObstacleT2Left < 100) && (ObstacleT2Left > 50) && (charY > ObstacleB2Top - 15) && (charY < canvasHeight - charHeight - ObstacleT2Bottom + 15))){
-			//if(((charY > ObstacleBTop - 15) && (charY < canvasHeight - charHeight - ObstacleTBottom + 15)) || ((charY > ObstacleB2Top - 15) && (charY < canvasHeight - charHeight - ObstacleT2Bottom + 15))){
 			insideObstacle = true;
 		}else{
-			if(insideObstacle){
+			if(insideObstacle){//score incrementation
 				score += 1;
 				scoreElem.innerHTML = `${score}`;
 				insideObstacle = false;
@@ -474,8 +386,6 @@ function starting() {
 		}else if(ObstacleT2Left < 110) {
 			targetNote2Elem.innerHTML = null;
 		}
-	
-		
 
 		//COLLISION DETECTION:
 		if(collisionDetection){
@@ -503,18 +413,13 @@ function starting() {
 					else {
 						scoreElem_2.innerHTML = "Score in " + songTitle +" : " + temp_score;
 					}
-					// scoreElem_2.innerHTML = `Your score is: ${temp_score}`;
 					score = 0;
 					scoreElem.innerHTML = `${score}`;
 				}
 			}
-		}
-		
-
+		}	
 	},10);
-	
 }
-
 
 //Input stream management
 function noteFromPitch( frequency ) {
@@ -523,7 +428,7 @@ function noteFromPitch( frequency ) {
 }
 
 function updatePitch() {//it also update the character y position
-	analyser.getFloatTimeDomainData( buf );
+	analyser.getFloatTimeDomainData(buf);
 	let pitch = autoCorrelate( buf, audioContext.sampleRate );
 	
     if ((pitch == -1) || (pitch < 98)){ //Note too low or pitch not found
@@ -585,7 +490,6 @@ function oscPlay(pitch){
 	}
 
 	gain.gain.linearRampToValueAtTime(max_gain,now + attack);
-	//gain.gain.linearRampToValueAtTime(0,now + attack + decay); //For single test sound
 	o.start();
 	oscStorage = o;
 	gainStorage = gain;
@@ -713,7 +617,6 @@ function toGameOverMenu(){
 	retry.style.animation = 'scrollButtonRetry 1.5s linear';
 	scoreElem_2.style.animation = 'scrollTitle 1.5s linear';
 	plant.style.animation = 'animPlant 1.5s linear';
-	//oscStop();
 	if(guidedStart){
 		firstNote = true;
 	}else{
@@ -779,7 +682,7 @@ function selectDifficulty(diff){
 		case 3: //HARD
 			ObVel = 3;
 			charToTargetVelocity = 0.2;
-			errorMargin = 16;
+			errorMargin = 14;
 			intervalsVector = [0,1,2,3,4,5,6,7,8,9,10,11,12,-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12];
 			difficulty = "Hard mode";
 			break;
@@ -826,48 +729,6 @@ function selectSong(song_number){
 	starting();
 }
 
-/*function setRandom(){
-	mode = true;
-
-	let diff1 = document.createElement("li");
-	let diff2 = document.createElement("li");
-	let diff3 = document.createElement("li");
-	let diff4 = document.createElement("li");
-	let diff5 = document.createElement("li");
-	
-	var ul = document.getElementById("mode_list");
-
-	diff1.className = "button";
-	diff2.className = "button";
-	diff3.className = "button";
-	diff4.className = "button";
-	diff5.className = "button";
-
-
-
-	diff1.onclick = function() { selectDifficulty(1); };
-	diff2.onclick = function() { selectDifficulty(2); };
-	diff3.onclick = function() { selectDifficulty(3); };
-	diff4.onclick = function() { selectDifficulty(4); };
-	diff5.onclick = function() { selectDifficulty(5); };
-
-
-
-	diff1.appendChild(document.createTextNode("Easy"));
-	diff2.appendChild(document.createTextNode("Normal"));
-	diff3.appendChild(document.createTextNode("Hard"));
-	diff4.appendChild(document.createTextNode("SpeedFreak"));
-	diff5.appendChild(document.createTextNode("PerfectPitch"));
-
-  	ul.appendChild(diff1);
-	ul.appendChild(diff2);
-	ul.appendChild(diff3);
-	ul.appendChild(diff4);
-	ul.appendChild(diff5);
-
-	//starting();
-}*/
-
 function charSpeedUpdate(value){
 	charFallVelocity = value;
 	charToTargetVelocity = charFallVelocity/14;
@@ -876,30 +737,20 @@ function charSpeedUpdate(value){
 function obstacleSpeedUpdate(value){
 	ObVel = value;
 }
-
-function updateGuidePitch(){
-	if (checkbox_pitch_guiding.checked){
-	  pitchGuiding = true;
-	  checkbox_guided_start.checked = false;
-	}else{
-	  pitchGuiding = false;
-	}
-  }
   
-  function updateDisableCollision(){
+function updateDisableCollision(){
 	if (checkbox_disable_collision.checked){
 	  collisionDetection = false;
 	}else{
 	  collisionDetection = true;
 	}
-  }
+}
   
-  function updateGuidedStart(){
+function updateGuidedStart(){
 	if (checkbox_guided_start.checked){
-	  checkbox_pitch_guiding.checked=false;
 	  guidedStart = true;
 	}else{
 	  guidedStart = false;
 	}
-  }
+}
 

@@ -1,6 +1,3 @@
-.c-body{
-    color: rgb(43, 0, 0)
-}
 
 #option{
     background-image: url(option3.png);
@@ -293,11 +290,10 @@
 
 /* --------------------CHECKMARKS PER OPTION MENU'------------------------ */
 
-/* Customize the label (the container) */
 .container {
     display: block;
     position: relative;
-    margin-top: 130px;
+    margin-top: 150px;
     margin-left: 30%;
     cursor: pointer;
     font-size: 70px;
@@ -311,7 +307,6 @@
     user-select: none;
   }
   
-  /* Hide the browser's default radio button */
   .container input {
     position: absolute;
     opacity: 0;
@@ -320,7 +315,6 @@
     width: 0;
   }
   
-  /* Create a custom radio button */
   .checkmark {
     position: absolute;
     top: -5px;
@@ -331,36 +325,31 @@
     border-radius: 50%;
   }
   
-  /* On mouse-over, add a grey background color */
   .container:hover input ~ .checkmark {
     background-color: #ccc;
   }
   
-  /* When the radio button is checked, add a blue background */
   .container input:checked ~ .checkmark {
     background-color: rgb(216, 158, 50);
   }
   
-  /* Create the indicator (the dot/circle - hidden when not checked) */
   .checkmark:after {
     content: "";
     position: absolute;
     display: none;
   }
   
-  /* Show the indicator (dot/circle) when checked */
   .container input:checked ~ .checkmark:after {
     display: block;
   }
   
-  /* Style the indicator (dot/circle) */
   .container .checkmark:after {
     top: 30px;
     left: 30px;
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: black;
+    background: rgb(43, 59, 75);
   }
 
 /* --------------------IMMAGINI E TITOLI------------------------ */
@@ -493,12 +482,11 @@
 }
 
 @keyframes animPlant {
-    0%{left:-330px;opacity :1;}
+    0%{left: -445px;opacity :1;}
     25%{left:-20px;}
-    75%{left:830px;}
-    95%{opacity: 1;}
-    100%{left: 1300px; opacity:0;}
-    
+    50%{opacity:1}
+    75%{left:810px;}
+    100%{left:830px; opacity:0;} 
 }
 
 @keyframes anim_cic1 {
