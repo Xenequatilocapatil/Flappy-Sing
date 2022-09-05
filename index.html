@@ -5,127 +5,129 @@
 		<link rel="stylesheet" href="game_menu.css" />
 	</head>
     <body>
+		<div id="background">
 		
-		<!-- MAIN MENU
-		<div id = "start-screen" class = "menu screen" style="display:block">
-			<img src="title.png" alt="title" width="1500px" height="300px">
-				<li class = "button button--play" onclick="toModeMenu()">Play</li>
+			<!-- MAIN MENU
+			<div id = "start-screen" class = "menu screen" style="display:block">
+				<img src="title.png" alt="title" width="1500px" height="300px">
+					<li class = "button button--play" onclick="toModeMenu()">Play</li>
+					<div id = "option" onclick="toOptionsMenu()"></div>
+			</div> -->
+
+			<!-- STARTING SCREEN WITH ANIMATION -->
+			<div id = "starting-screen" class = "menu screen" style="display:block">
+				<div id="cicada1"></div>
+				<div id="cicada2"></div>
+				<div id="cicada3"></div>
+				<div id="carnivorous"></div>
+				<div id = "flappy_sing_title"></div>
+				<div id = "song" onclick="toSongMenu()"></div>
+				<div id = "random" onclick="toDiffMenu()"></div>
 				<div id = "option" onclick="toOptionsMenu()"></div>
-		</div> -->
+			</div>
 
-		<!-- STARTING SCREEN WITH ANIMATION -->
-		<div id = "starting-screen" class = "menu screen" style="display:block">
-			<div id="cicada1"></div>
-			<div id="cicada2"></div>
-			<div id="cicada3"></div>
-			<div id="carnivorous"></div>
-			<div id = "flappy_sing_title"></div>
-			<div id = "song" onclick="toSongMenu()"></div>
-			<div id = "random" onclick="toDiffMenu()"></div>
-			<div id = "option" onclick="toOptionsMenu()"></div>
-		</div>
+			<!-- GAME MODE MENU -->
+			<div id = "mode-screen" class = "menu screen" style="display:block">
+				<div id = "flappy_sing_title"></div>
+				<div id = "song" onclick="toSongMenu()"></div>
+				<div id = "random" onclick="toDiffMenu()"></div>
+				<div id = "option" onclick="toOptionsMenu()"></div>
+			</div>
 
-		<!-- GAME MODE MENU -->
-		<div id = "mode-screen" class = "menu screen" style="display:block">
-			<div id = "flappy_sing_title"></div>
-			<div id = "song" onclick="toSongMenu()"></div>
-			<div id = "random" onclick="toDiffMenu()"></div>
-			<div id = "option" onclick="toOptionsMenu()"></div>
-		</div>
+			<!-- DIFFICULTY MENU -->
+			<div id = "diff-screen" class = "menu screen" style="display:none">
+				<div id = "choose_difficulty"></div>
+				<div id = "easy_btn" onclick="selectDifficulty(1)"></div>
+				<div id = "normal_btn" onclick="selectDifficulty(2)"></div>
+				<div id = "hard_btn" onclick="selectDifficulty(3)"></div>
+				<div id = "speedfreak_btn" onclick="selectDifficulty(4)"></div>
+				<div id = "perfectpitch_btn" onclick="selectDifficulty(5)"></div>
+				<!-- <ul id = "diff_list">
+					<li class = "button button--easy" onclick="selectDifficulty(1)">Easy</li>
+					<li class = "button button--normal" onclick="selectDifficulty(2)">Normal</li>
+					<li class = "button button--hard" onclick="selectDifficulty(3)">Hard</li>
+					<li class = "button button--speadfreak" onclick="selectDifficulty(4)">SpeedFreak</li>
+					<li class = "button button--perfectpitch" onclick="selectDifficulty(5)">PerfectPitch</li> -->
 
-		<!-- DIFFICULTY MENU -->
-		<div id = "diff-screen" class = "menu screen" style="display:none">
-			<div id = "choose_difficulty"></div>
-			<div id = "easy_btn" onclick="selectDifficulty(1)"></div>
-			<div id = "normal_btn" onclick="selectDifficulty(2)"></div>
-			<div id = "hard_btn" onclick="selectDifficulty(3)"></div>
-			<div id = "speedfreak_btn" onclick="selectDifficulty(4)"></div>
-			<div id = "perfectpitch_btn" onclick="selectDifficulty(5)"></div>
-			<!-- <ul id = "diff_list">
-				<li class = "button button--easy" onclick="selectDifficulty(1)">Easy</li>
-				<li class = "button button--normal" onclick="selectDifficulty(2)">Normal</li>
-				<li class = "button button--hard" onclick="selectDifficulty(3)">Hard</li>
-				<li class = "button button--speadfreak" onclick="selectDifficulty(4)">SpeedFreak</li>
-				<li class = "button button--perfectpitch" onclick="selectDifficulty(5)">PerfectPitch</li> -->
+					<div id = "back" onclick="toModeMenu()"></div>
+			</div>
 
+			<!-- SONG MENU -->
+			<div id = "song-screen" class = "menu screen" style="display:none">
+				<div id = "choose_song"></div>
+				<div id = "framartino_btn" onclick="selectSong(1)"></div>
+				<div id = "perelisa_btn" onclick="selectSong(2)"></div>
+				<div id = "halo_btn" onclick="selectSong(3)"></div>
 				<div id = "back" onclick="toModeMenu()"></div>
-		</div>
+				<!-- <ul>
+					<li class = "button button--s1" onclick="selectSong(1)">Fra Martino</li>
+					<li class = "button button--s2" onclick="selectSong(2)">Per Elisa</li>
+					<li class = "button button--s3" onclick="selectSong(3)">Halo</li> -->
+			</div>
 
-		<!-- SONG MENU -->
-		<div id = "song-screen" class = "menu screen" style="display:none">
-			<div id = "choose_song"></div>
-			<div id = "framartino_btn" onclick="selectSong(1)"></div>
-			<div id = "perelisa_btn" onclick="selectSong(2)"></div>
-			<div id = "halo_btn" onclick="selectSong(3)"></div>
-			<div id = "back" onclick="toModeMenu()"></div>
-			<!-- <ul>
-				<li class = "button button--s1" onclick="selectSong(1)">Fra Martino</li>
-				<li class = "button button--s2" onclick="selectSong(2)">Per Elisa</li>
-				<li class = "button button--s3" onclick="selectSong(3)">Halo</li> -->
-		</div>
+			<!-- OPTIONS MENU -->
+			<div id = "options-screen" class="menu screen" style="display:none">
 
-		<!-- OPTIONS MENU -->
-		<div id = "options-screen" class="menu screen" style="display:none">
+				<label for="pitch_guiding">Guide Pitch</label>
+				<input type = "checkbox"
+					id = "pitch_guiding"
+					name = "Guide Pitch"
+				onchange="updateGuidePitch()">
 
-			<label for="pitch_guiding">Guide Pitch</label>
-			<input type = "checkbox"
-				id = "pitch_guiding"
-				name = "Guide Pitch"
-			onchange="updateGuidePitch()">
+				<label for="disable_collision">Disable Collision</label>
+				<input type = "checkbox"
+					id = "disable_collision"
+					name = "Disable Collision"
+				onchange="updateDisableCollision()">
 
-			<label for="disable_collision">Disable Collision</label>
-			<input type = "checkbox"
-				id = "disable_collision"
-				name = "Disable Collision"
-			onchange="updateDisableCollision()">
+				<label for="disable_guided_start">Disable Guided Start</label>
+				<input type = "checkbox"
+					id = "disable_guided_start"
+					name = "Disable Guided Start"
+				onchange="updateDisableGuidedStart()">
 
-			<label for="disable_guided_start">Disable Guided Start</label>
-			<input type = "checkbox"
-				id = "disable_guided_start"
-				name = "Disable Guided Start"
-			onchange="updateDisableGuidedStart()">
+				<ul>
+					<div id = "back" onclick="toModeMenu()"></div>
 
-			<ul>
-				<div id = "back" onclick="toModeMenu()"></div>
+			</div>
 
-		</div>
+			<!-- GAME OVER MENU -->
+			<div id = "gameover-screen" class="menu screen" style="display:none">
+				<h1 class = "title">Game Over!</h1>
+				<ul>
+					<li class = "button button--retry" onclick="starting()">Retry</li>
+					<li class = "button button--main-menu" onclick="toModeMenu()">Main Menu</li>
 
-		<!-- GAME OVER MENU -->
-		<div id = "gameover-screen" class="menu screen" style="display:none">
-			<h1 class = "title">Game Over!</h1>
-			<ul>
-				<li class = "button button--retry" onclick="starting()">Retry</li>
-				<li class = "button button--main-menu" onclick="toModeMenu()">Main Menu</li>
-
-		</div>
-		
-		<div id = "indicators" style ="display:none">
-			<span id="note">--</span>
-			<span id="freq">--</span>
-			<span id="score">score: </span>
-		</div>
-		
-		<!--GAME-->
-		<div id="game" style="display:none">
-			<div id="targetNote"></div>
-			<div id="targetNote2"></div>
-			<div id="character"></div>
-			<div id="obstacleT"></div>
-			<div id="obstacleB"></div>
-			<div id="obstacleT2"></div>
-			<div id="obstacleB2"></div>
-			<div id="grass"></div>
-		</div>
+			</div>
+			
+			<div id = "indicators" style ="display:none">
+				<span id="note">--</span>
+				<span id="freq">--</span>
+				<span id="score">score: </span>
+			</div>
+			
+			<!--GAME-->
+			<div id="game" style="display:none">
+				<div id="targetNote"></div>
+				<div id="targetNote2"></div>
+				<div id="character"></div>
+				<div id="obstacleT"></div>
+				<div id="obstacleB"></div>
+				<div id="obstacleT2"></div>
+				<div id="obstacleB2"></div>
+				<div id="grass"></div>
+			</div>
 
 
-		<!-- GAME OVER MENU -->
-		<div id="gameover" style="display:none">
-			<div id="plant"></div>
-			<div id="score_2"></div>
-			<div id = "home" onclick="toModeMenu()"></div>
-			<div id = "retry" onclick="starting()"></div>		
-		</div>
+			<!-- GAME OVER MENU -->
+			<div id="gameover" style="display:none">
+				<div id="plant"></div>
+				<div id="score_2"></div>
+				<div id = "home" onclick="toModeMenu()"></div>
+				<div id = "retry" onclick="starting()"></div>		
+			</div>
 
-		<script src="FlappySing.js"></script>
+			<script src="FlappySing.js"></script>
+	    </div>
     </body>
 </html>

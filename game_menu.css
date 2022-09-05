@@ -356,7 +356,8 @@
     height: 450px;
     position: absolute;
     top: -109px;
-    left: 1300px;
+    left: 500px;
+    opacity: 0;
 }
 
 #cicada1 {
@@ -464,10 +465,12 @@
 }
 
 @keyframes animPlant {
-    0%{left:-330px;}
+    0%{left:-330px;opacity :1;}
     25%{left:-20px;}
     75%{left:830px;}
-    100%{left: 1300px;}
+    95%{opacity: 1;}
+    100%{left: 1300px; opacity:0;}
+    
 }
 
 @keyframes anim_cic1 {
