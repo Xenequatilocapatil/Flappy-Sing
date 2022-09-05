@@ -386,8 +386,6 @@ function GenerationObstacle(song, mode){
 
 	//if(pitchGuiding && (currentPitch[0] != null))
 		//oscPlay(currentPitch[0]);
-
-
 }
 
 function GenerationObstacle2(song, mode){
@@ -399,13 +397,13 @@ function GenerationObstacle2(song, mode){
 		pitch2 = GenerationHoleSeries(ObB2Elem, ObT2Elem, song, targetNote2Elem);
 		oscStop();
 	}
+	
 
 	//currentPitch[0] = currentPitch[1];
 	//currentPitch[1] = pitch2;
 
 	//if(pitchGuiding && (currentPitch[0] != null))
 		//oscPlay(currentPitch[0]);
-
 }
 
 
@@ -443,14 +441,6 @@ function starting() {
 	}*/
 	//START PLAYING CURRENT PITCH = PITCH1
 
-	//Old code
-	/*ObBElem.addEventListener('animationend', () => {
-			GenerationObstacle(choosenSong, mode);
-	});
-
-	ObB2Elem.addEventListener('animationend', () => {
-			GenerationObstacle2(choosenSong, mode);
-	});*/
 
 	var refreshIntervalID = setInterval(function(){ 
 		let ObstacleTLeft = parseInt(window.getComputedStyle(ObTElem).getPropertyValue("left"));
@@ -463,11 +453,24 @@ function starting() {
 		let ObstacleB2Top = parseInt(window.getComputedStyle(ObB2Elem).getPropertyValue("height"))-15;
 		let charY = parseInt(window.getComputedStyle(charElem).getPropertyValue("bottom"));
 	
+		/*if(ObstacleTLeft < 50 && ObstacleTLeft > 30){
+			oscPlay(pitch2);
+		}
+		if(ObstacleT2Left < 400 && ObstacleTLeft > 330){
+			oscStop();
+		}
+		if(ObstacleT2Left < 50 && ObstacleT2Left > 30){
+			oscPlay(pitch1);
+		}
+		if(ObstacleTLeft < 400 && ObstacleT2Left > 330){
+			oscStop();
+		}*/
+
 		if(((ObstacleTLeft < 100) && (ObstacleTLeft > 50)) || ((ObstacleT2Left < 100) && (ObstacleT2Left > 50))){// score incrementation
 			insideObstacle = true;
-			if(pitchGuiding){
-				oscStop();
-			}
+			//if(pitchGuiding){
+				//oscStop();
+			//}
 		}else{
 			if(insideObstacle == true){
 				score += 1;
